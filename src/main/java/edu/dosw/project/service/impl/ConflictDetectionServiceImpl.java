@@ -7,7 +7,7 @@ import edu.dosw.project.repository.HorarioRepository;
 import edu.dosw.project.repository.ConflictoRepository;
 import edu.dosw.project.service.ConflictDetectionService;
 import org.springframework.stereotype.Service;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,14 +24,17 @@ public class ConflictDetectionServiceImpl implements ConflictDetectionService {
 
     @Override
     public void detectConflictsForSolicitud(Solicitud solicitud) {
-        Horario prop = horarioRepository.findById(solicitud.getHorarioPropuestoId()).orElse(null);
-        if (prop == null) return;
-        if (prop.isFull()) {
+        // Para el SIRHA, detectamos conflictos relacionados con el grupo destino
+        if (solicitud.getGrupoDestinoId() != null) {
+            // Verificar si el grupo destino tiene cupos disponibles
+            // (Esto requeriría un servicio adicional para manejar grupos)
+            
+            // Crear conflicto por ejemplo
             Conflicto c = new Conflicto();
-            c.setDescripcion("Cupo excedido en horario propuesto");
-            c.setDetectedAt(Instant.now());
+            c.setDescripcion("Verificando disponibilidad en grupo destino: " + solicitud.getGrupoDestinoId());
+            c.setDetectedAt(LocalDateTime.now());
             c.setResolved(false);
-            c.setInvolucrados(List.of(solicitud.getStudentId(), solicitud.getHorarioPropuestoId()));
+            c.setInvolucrados(List.of(solicitud.getEstudianteId(), solicitud.getGrupoDestinoId()));
             conflictoRepository.save(c);
         }
     }
@@ -40,10 +43,11 @@ public class ConflictDetectionServiceImpl implements ConflictDetectionService {
     public Conflicto detectConflictsForHorario(String horarioId) {
         Horario h = horarioRepository.findById(horarioId).orElse(null);
         if (h == null) return null;
+        
         if (h.getInscritos() > h.getCupos()) {
             Conflicto c = new Conflicto();
             c.setDescripcion("Sobrecupo detectado en horario " + horarioId);
-            c.setDetectedAt(Instant.now());
+            c.setDetectedAt(LocalDateTime.now());
             c.setInvolucrados(List.of(horarioId));
             c.setResolved(false);
             return conflictoRepository.save(c);

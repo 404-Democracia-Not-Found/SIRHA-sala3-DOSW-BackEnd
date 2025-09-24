@@ -9,4 +9,7 @@ public interface SolicitudService {
     List<Solicitud> findByStudent(String studentId);
     Solicitud approveSolicitud(String solicitudId, String approverId);
     Solicitud rejectSolicitud(String solicitudId, String approverId, String reason);
+    List<Solicitud> findAll();
+    Solicitud findById(String id);
+    List<Solicitud> findByEstado(String estado);
 }
