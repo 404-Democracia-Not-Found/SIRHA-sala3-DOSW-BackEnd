@@ -94,8 +94,9 @@ public class SolicitudController {
             @Parameter(description = "ID de la solicitud", required = true)
             @PathVariable String id) {
         try {
-            Solicitud solicitud = solicitudService.findById(id);
-            return ResponseEntity.ok(solicitud);
+            return solicitudService.findById(id)
+                .map(solicitud -> ResponseEntity.ok(solicitud))
+                .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

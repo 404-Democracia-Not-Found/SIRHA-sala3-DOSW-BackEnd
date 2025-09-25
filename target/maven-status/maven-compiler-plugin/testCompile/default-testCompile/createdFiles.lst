@@ -1,1 +1,4 @@
-edu\dosw\project\service\impl\SolicitudServiceImplTest.class
+edu\dosw\project\model\SolicitudTest.class
+edu\dosw\project\model\UserModelTest.class
+edu\dosw\project\dto\SolicitudCreateDtoModelTest.class
+edu\dosw\project\service\impl\UserServiceImplTest.class
