@@ -2,49 +2,114 @@ package edu.dosw.project.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.Instant;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document("solicitudes")
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Document(collection = "solicitudes")
 public class Solicitud {
     @Id
     private String id;
-    private String studentId;
-    private String materiaId;
-    private String horarioActualId;
-    private String horarioPropuestoId;
-    private Status status;
-    private String comments;
-    private Instant createdAt;
-    private Instant updatedAt;
-
-    public enum Status { PENDING, APPROVED, REJECTED, CANCELLED }
-
-    public Solicitud() {}
-
+    
+    @Field("codigo_solicitud")
+    private String codigoSolicitud;
+    
+    private String estado; // PENDIENTE, EN_REVISION, APROBADA, RECHAZADA
+    
+    @Field("fecha_solicitud")
+    private LocalDateTime fechaSolicitud;
+    
+    private String tipo; // CAMBIO_GRUPO, CAMBIO_MATERIA
+    
+    private String descripcion;
+    
+    @Field("estudiante_id")
+    private String estudianteId;
+    
+    @Field("inscripcion_origen_id")
+    private String inscripcionOrigenId;
+    
+    @Field("grupo_destino_id")
+    private String grupoDestinoId;
+    
+    @Field("periodo_id")
+    private String periodoId;
+    
+    private Integer prioridad;
+    
+    @Field("fecha_limite_respuesta")
+    private LocalDateTime fechaLimiteRespuesta;
+    
+    private List<HistorialSolicitud> historial;
+    
+    public static class HistorialSolicitud {
+        private LocalDateTime fecha;
+        private String accion;
+        
+        @Field("usuario_id")
+        private String usuarioId;
+        
+        private String comentario;
+        
+        public HistorialSolicitud() {}
+        
+        // Getters and Setters
+        public LocalDateTime getFecha() { return fecha; }
+        public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+        
+        public String getAccion() { return accion; }
+        public void setAccion(String accion) { this.accion = accion; }
+        
+        public String getUsuarioId() { return usuarioId; }
+        public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+        
+        public String getComentario() { return comentario; }
+        public void setComentario(String comentario) { this.comentario = comentario; }
+    }
+    
+    public Solicitud() {
+        this.fechaSolicitud = LocalDateTime.now();
+        this.estado = "PENDIENTE";
+    }
+    
+    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
-    public String getStudentId() { return studentId; }
-    public void setStudentId(String studentId) { this.studentId = studentId; }
-
-    public String getMateriaId() { return materiaId; }
-    public void setMateriaId(String materiaId) { this.materiaId = materiaId; }
-
-    public String getHorarioActualId() { return horarioActualId; }
-    public void setHorarioActualId(String horarioActualId) { this.horarioActualId = horarioActualId; }
-
-    public String getHorarioPropuestoId() { return horarioPropuestoId; }
-    public void setHorarioPropuestoId(String horarioPropuestoId) { this.horarioPropuestoId = horarioPropuestoId; }
-
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
-
-    public String getComments() { return comments; }
-    public void setComments(String comments) { this.comments = comments; }
-
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-
-    public Instant getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+    
+    public String getCodigoSolicitud() { return codigoSolicitud; }
+    public void setCodigoSolicitud(String codigoSolicitud) { this.codigoSolicitud = codigoSolicitud; }
+    
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    
+    public LocalDateTime getFechaSolicitud() { return fechaSolicitud; }
+    public void setFechaSolicitud(LocalDateTime fechaSolicitud) { this.fechaSolicitud = fechaSolicitud; }
+    
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+    
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    
+    public String getEstudianteId() { return estudianteId; }
+    public void setEstudianteId(String estudianteId) { this.estudianteId = estudianteId; }
+    
+    public String getInscripcionOrigenId() { return inscripcionOrigenId; }
+    public void setInscripcionOrigenId(String inscripcionOrigenId) { this.inscripcionOrigenId = inscripcionOrigenId; }
+    
+    public String getGrupoDestinoId() { return grupoDestinoId; }
+    public void setGrupoDestinoId(String grupoDestinoId) { this.grupoDestinoId = grupoDestinoId; }
+    
+    public String getPeriodoId() { return periodoId; }
+    public void setPeriodoId(String periodoId) { this.periodoId = periodoId; }
+    
+    public Integer getPrioridad() { return prioridad; }
+    public void setPrioridad(Integer prioridad) { this.prioridad = prioridad; }
+    
+    public LocalDateTime getFechaLimiteRespuesta() { return fechaLimiteRespuesta; }
+    public void setFechaLimiteRespuesta(LocalDateTime fechaLimiteRespuesta) { this.fechaLimiteRespuesta = fechaLimiteRespuesta; }
+    
+    public List<HistorialSolicitud> getHistorial() { return historial; }
+    public void setHistorial(List<HistorialSolicitud> historial) { this.historial = historial; }
 }
