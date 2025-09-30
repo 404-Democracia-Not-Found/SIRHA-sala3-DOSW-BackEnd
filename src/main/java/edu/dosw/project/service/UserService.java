@@ -1,6 +1,8 @@
 package edu.dosw.project.service;
 
 import edu.dosw.project.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +18,8 @@ public interface UserService {
     boolean existsByEmail(String email);
     List<User> searchUsers(String searchTerm);
     boolean hasRole(User user, String roleType);
+    
+    // Métodos adicionales para administración
+    Page<User> findAllWithFilters(User.Rol rol, String programaId, String busqueda, Pageable pageable);
+    String getProgramaAcademico(String userId);
 }

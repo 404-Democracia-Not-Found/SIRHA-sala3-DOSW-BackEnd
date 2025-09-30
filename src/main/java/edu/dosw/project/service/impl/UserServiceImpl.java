@@ -216,6 +216,27 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public String getProgramaAcademico(String userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario no encontrado con ID: " + userId);
+        }
+        
+        User user = userOpt.get();
+        
+        // Buscar el programa académico según el rol del usuario
+        if (user.getRoles() != null) {
+            for (User.Rol rol : user.getRoles()) {
+                if (rol.getProgramaAcademicoId() != null) {
+                    return rol.getProgramaAcademicoId();
+                }
+            }
+        }
+        
+        return null; // No tiene programa asignado
+    }
+
     private boolean isValidEmail(String email) {
         return StringUtils.hasText(email) && EMAIL_PATTERN.matcher(email).matches();
     }

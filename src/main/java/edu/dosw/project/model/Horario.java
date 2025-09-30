@@ -46,4 +46,21 @@ public class Horario {
     public boolean isFull() {
         return inscritos >= cupos;
     }
+    
+    // Métodos adicionales para compatibilidad con controladores
+    public String getDiaSemana() {
+        return dia != null ? dia.name() : null;
+    }
+    
+    public LocalTime getHoraInicio() {
+        return inicio;
+    }
+    
+    public LocalTime getHoraFin() {
+        return fin;
+    }
+    
+    public String getAula() {
+        return aulaId;
+    }
 }

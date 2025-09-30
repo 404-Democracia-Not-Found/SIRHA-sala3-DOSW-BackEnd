@@ -12,12 +12,12 @@ import java.util.Optional;
 @Repository
 public interface SolicitudRepository extends MongoRepository<Solicitud, String> {
     List<Solicitud> findByEstudianteId(String estudianteId);
-    List<Solicitud> findByEstado(String estado);
+    List<Solicitud> findByEstado(Solicitud.EstadoSolicitud estado);
     List<Solicitud> findByTipo(String tipo);
     List<Solicitud> findByPeriodoId(String periodoId);
     
     @Query("{'estudianteId': ?0, 'estado': ?1}")
-    List<Solicitud> findByEstudianteIdAndEstado(String estudianteId, String estado);
+    List<Solicitud> findByEstudianteIdAndEstado(String estudianteId, Solicitud.EstadoSolicitud estado);
     
     @Query("{'fechaSolicitud': {'$gte': ?0, '$lte': ?1}}")
     List<Solicitud> findByFechaSolicitudBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin);

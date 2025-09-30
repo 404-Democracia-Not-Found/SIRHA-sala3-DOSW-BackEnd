@@ -3,28 +3,24 @@ package edu.dosw.project.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Document(collection = "materias")
-public class Materia {
+@Document(collection = "facultades")
+public class Facultad {
     @Id
     private String id;
     
     private String codigo;
     private String nombre;
-    private Integer creditos;
-    
-    @Field("facultad_id")
-    private String facultadId;
-    
     private String descripcion;
     
-    @Field("aulas_posibles")
-    private List<String> aulasPosibles;
+    @Field("coordinador_id")
+    private String coordinadorId;
     
-    @Field("prerequisitos")
-    private List<String> prerequisitos; // IDs de materias prerequisito
+    @Field("materias_ids")
+    private List<String> materiasIds;
     
     private Boolean activa;
     
@@ -32,18 +28,16 @@ public class Materia {
     private LocalDateTime fechaCreacion;
 
     // Constructor por defecto
-    public Materia() {
+    public Facultad() {
         this.fechaCreacion = LocalDateTime.now();
         this.activa = true;
     }
 
     // Constructor con parámetros principales
-    public Materia(String codigo, String nombre, Integer creditos, String facultadId) {
+    public Facultad(String codigo, String nombre) {
         this();
         this.codigo = codigo;
         this.nombre = nombre;
-        this.creditos = creditos;
-        this.facultadId = facultadId;
     }
 
     // Getters y Setters
@@ -56,20 +50,14 @@ public class Materia {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public Integer getCreditos() { return creditos; }
-    public void setCreditos(Integer creditos) { this.creditos = creditos; }
-
-    public String getFacultadId() { return facultadId; }
-    public void setFacultadId(String facultadId) { this.facultadId = facultadId; }
-
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public List<String> getAulasPosibles() { return aulasPosibles; }
-    public void setAulasPosibles(List<String> aulasPosibles) { this.aulasPosibles = aulasPosibles; }
+    public String getCoordinadorId() { return coordinadorId; }
+    public void setCoordinadorId(String coordinadorId) { this.coordinadorId = coordinadorId; }
 
-    public List<String> getPrerequisitos() { return prerequisitos; }
-    public void setPrerequisitos(List<String> prerequisitos) { this.prerequisitos = prerequisitos; }
+    public List<String> getMateriasIds() { return materiasIds; }
+    public void setMateriasIds(List<String> materiasIds) { this.materiasIds = materiasIds; }
 
     public Boolean getActiva() { return activa; }
     public void setActiva(Boolean activa) { this.activa = activa; }
