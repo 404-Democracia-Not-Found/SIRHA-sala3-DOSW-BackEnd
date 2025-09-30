@@ -6,6 +6,7 @@ import edu.dosw.project.model.Horario;
 import edu.dosw.project.model.Grupo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Servicio para la detección automática de conflictos de horario
@@ -24,6 +25,16 @@ public interface ConflictDetectionService {
     Conflicto detectConflictsForHorario(String horarioId);
     
     /**
+     * Verifica si un estudiante tiene conflicto de horario con un grupo
+     */
+    boolean tieneConflictoHorarioEstudiante(String estudianteId, String grupoDestinoId);
+    
+    /**
+     * Analiza conflictos para una solicitud
+     */
+    Map<String, Object> analizarConflictos(String solicitudId);
+    
+    /**
      * Detecta conflictos de horario para un estudiante específico
      * al intentar inscribirse en un nuevo grupo
      * 
@@ -40,7 +51,7 @@ public interface ConflictDetectionService {
      * @param grupoDestinoId ID del grupo destino
      * @return true si hay conflictos, false si no
      */
-    boolean tieneConflictoHorario(String grupoActualId, String grupoDestinoId);
+    boolean tieneConflictoHorarioGrupos(String grupoActualId, String grupoDestinoId);
     
     /**
      * Valida si una solicitud de cambio puede ser aprobada
@@ -78,4 +89,12 @@ public interface ConflictDetectionService {
      * @return Lista de grupos disponibles sin conflictos
      */
     List<Grupo> buscarGruposSinConflictos(String estudianteId, String materiaId, String periodoAcademicoId);
+    
+    /**
+     * Valida conflictos de manera masiva para múltiples solicitudes
+     * 
+     * @param solicitudIds Lista de IDs de solicitudes
+     * @return Mapa con resultados de validación por solicitud
+     */
+    Map<String, Object> validarConflictosMasivo(List<String> solicitudIds);
 }

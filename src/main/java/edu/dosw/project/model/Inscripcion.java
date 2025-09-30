@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Document(collection = "inscripciones")
 public class Inscripcion {
@@ -92,6 +91,8 @@ public class Inscripcion {
 
     public EstadoMateria getEstado() { return estado; }
     public void setEstado(EstadoMateria estado) { this.estado = estado; }
+    
+    public EstadoMateria getEstadoMateria() { return estado; }
 
     public LocalDateTime getFechaInscripcion() { return fechaInscripcion; }
     public void setFechaInscripcion(LocalDateTime fechaInscripcion) { this.fechaInscripcion = fechaInscripcion; }

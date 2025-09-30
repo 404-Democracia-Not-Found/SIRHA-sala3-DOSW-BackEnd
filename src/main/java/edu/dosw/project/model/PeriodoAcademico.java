@@ -15,7 +15,6 @@ public class PeriodoAcademico {
     private String codigo; // "2025-1", "2025-2"
     private String nombre; // "2025-1", "2025-2"
     private Integer anio;
-    private Integer año; // mantener compatibilidad
     private Integer semestre; // 1 o 2
     
     @Field("fecha_inicio")
@@ -48,7 +47,6 @@ public class PeriodoAcademico {
         this.nombre = nombre;
         this.codigo = anio + "-" + semestre;
         this.anio = anio;
-        this.año = anio;
         this.semestre = semestre;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
@@ -79,13 +77,6 @@ public class PeriodoAcademico {
     public Integer getAnio() { return anio; }
     public void setAnio(Integer anio) { 
         this.anio = anio; 
-        this.año = anio; // mantener sincronización
-    }
-
-    public Integer getAño() { return año; }
-    public void setAño(Integer año) { 
-        this.año = año; 
-        this.anio = año; // mantener sincronización
     }
 
     public Integer getSemestre() { return semestre; }

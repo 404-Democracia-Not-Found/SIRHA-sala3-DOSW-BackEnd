@@ -1,8 +1,10 @@
 package edu.dosw.project.service.impl;
 
+import edu.dosw.project.model.CalendarioAcademico;
 import edu.dosw.project.model.PeriodoAcademico;
 import edu.dosw.project.repository.PeriodoAcademicoRepository;
 import edu.dosw.project.service.CalendarioAcademicoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -10,12 +12,23 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CalendarioAcademicoServiceImpl implements CalendarioAcademicoService {
 
     private final PeriodoAcademicoRepository periodoAcademicoRepository;
-
-    public CalendarioAcademicoServiceImpl(PeriodoAcademicoRepository periodoAcademicoRepository) {
-        this.periodoAcademicoRepository = periodoAcademicoRepository;
+    
+    @Override
+    public boolean estaDentroPeriodoSolicitudes() {
+        return true; // Implementación temporal
+    }
+    
+    // Métodos adicionales para administración
+    public void configurarCalendario(CalendarioAcademico calendario) {
+        // Implementación temporal
+    }
+    
+    public void configurarPeriodoSolicitudes(boolean habilitado, String fechaInicio, String fechaFin) {
+        // Implementación temporal
     }
 
     @Override

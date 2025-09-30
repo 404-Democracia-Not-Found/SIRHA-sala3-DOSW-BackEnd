@@ -40,6 +40,11 @@ public interface CalendarioAcademicoService {
     boolean esPeriodoSolicitudesActivo();
     
     /**
+     * Verifica si está dentro del periodo de solicitudes
+     */
+    boolean estaDentroPeriodoSolicitudes();
+    
+    /**
      * Obtiene el período académico por año y semestre
      * 
      * @param anio Año del período

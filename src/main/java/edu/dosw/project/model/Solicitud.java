@@ -15,7 +15,17 @@ public class Solicitud {
     @Field("codigo_solicitud")
     private String codigoSolicitud;
     
-    private String estado; // PENDIENTE, EN_REVISION, APROBADA, RECHAZADA
+    private EstadoSolicitud estado; // PENDIENTE, EN_REVISION, APROBADA, RECHAZADA
+    
+    /**
+     * Estados posibles de una solicitud
+     */
+    public enum EstadoSolicitud {
+        PENDIENTE,
+        EN_REVISION, 
+        APROBADA,
+        RECHAZADA
+    }
     
     @Field("fecha_solicitud")
     private LocalDateTime fechaSolicitud;
@@ -40,6 +50,17 @@ public class Solicitud {
     
     @Field("fecha_limite_respuesta")
     private LocalDateTime fechaLimiteRespuesta;
+    
+    @Field("fecha_procesamiento")
+    private LocalDateTime fechaProcesamiento;
+    
+    @Field("coordinador_id")
+    private String coordinadorId;
+    
+    @Field("materia_id")
+    private String materiaId;
+    
+    private String observaciones;
     
     private List<HistorialSolicitud> historial;
     
@@ -70,7 +91,7 @@ public class Solicitud {
     
     public Solicitud() {
         this.fechaSolicitud = LocalDateTime.now();
-        this.estado = "PENDIENTE";
+        this.estado = EstadoSolicitud.PENDIENTE;
     }
     
     // Getters and Setters
@@ -80,8 +101,8 @@ public class Solicitud {
     public String getCodigoSolicitud() { return codigoSolicitud; }
     public void setCodigoSolicitud(String codigoSolicitud) { this.codigoSolicitud = codigoSolicitud; }
     
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public EstadoSolicitud getEstado() { return estado; }
+    public void setEstado(EstadoSolicitud estado) { this.estado = estado; }
     
     public LocalDateTime getFechaSolicitud() { return fechaSolicitud; }
     public void setFechaSolicitud(LocalDateTime fechaSolicitud) { this.fechaSolicitud = fechaSolicitud; }
@@ -109,6 +130,18 @@ public class Solicitud {
     
     public LocalDateTime getFechaLimiteRespuesta() { return fechaLimiteRespuesta; }
     public void setFechaLimiteRespuesta(LocalDateTime fechaLimiteRespuesta) { this.fechaLimiteRespuesta = fechaLimiteRespuesta; }
+    
+    public LocalDateTime getFechaProcesamiento() { return fechaProcesamiento; }
+    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) { this.fechaProcesamiento = fechaProcesamiento; }
+    
+    public String getCoordinadorId() { return coordinadorId; }
+    public void setCoordinadorId(String coordinadorId) { this.coordinadorId = coordinadorId; }
+    
+    public String getMateriaId() { return materiaId; }
+    public void setMateriaId(String materiaId) { this.materiaId = materiaId; }
+    
+    public String getObservaciones() { return observaciones; }
+    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
     
     public List<HistorialSolicitud> getHistorial() { return historial; }
     public void setHistorial(List<HistorialSolicitud> historial) { this.historial = historial; }

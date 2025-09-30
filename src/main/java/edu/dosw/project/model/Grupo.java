@@ -97,6 +97,13 @@ public class Grupo {
 
     public Integer getEstudiantesInscritos() { return estudiantesInscritos; }
     public void setEstudiantesInscritos(Integer estudiantesInscritos) { this.estudiantesInscritos = estudiantesInscritos; }
+    
+    // Métodos adicionales para controladores
+    public String getNombre() { return codigo; }
+    public Integer getInscritos() { return estudiantesInscritos; }
+    public String getProfesorNombre() { return "Profesor " + profesorId; } // Temporal
+    public List<Horario> getHorarios() { return List.of(); } // Temporal
+    public Materia getMateria() { return new Materia(); } // Temporal
 
     public List<String> getListaEspera() { return listaEspera; }
     public void setListaEspera(List<String> listaEspera) { this.listaEspera = listaEspera; }
