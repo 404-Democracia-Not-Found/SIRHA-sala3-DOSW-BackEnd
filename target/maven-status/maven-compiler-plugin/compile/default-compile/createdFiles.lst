@@ -12,6 +12,7 @@ edu\dosw\project\controller\SolicitudController.class
 edu\dosw\project\model\Solicitud$Status.class
 edu\dosw\project\exception\ResourceNotFoundException.class
 edu\dosw\project\service\impl\SolicitudServiceImpl.class
+edu\dosw\project\config\SwaggerConfig.class
 edu\dosw\project\service\impl\ConflictDetectionServiceImpl.class
 edu\dosw\project\model\Horario.class
 edu\dosw\project\model\Conflicto.class
