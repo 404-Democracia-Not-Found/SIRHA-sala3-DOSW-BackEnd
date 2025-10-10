@@ -3,15 +3,15 @@ spring:
     name: sirha
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/sirha}
-      database: ${MONGODB_DATABASE:sirha}
+      uri: ${MONGODB_URI:mongodb://localhost:27017}
+      database: ${MONGODB_DATABASE:SIRHA}
   jackson:
     default-property-inclusion: non_null
   main:
     banner-mode: off
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8081}
   error:
     include-message: always
     include-binding-errors: always
