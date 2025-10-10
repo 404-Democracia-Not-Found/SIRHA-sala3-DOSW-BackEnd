@@ -1,21 +1,5 @@
 package edu.dosw.sirha.service;
 
-import edu.dosw.sirha.dto.request.SolicitudRequest;
-import edu.dosw.sirha.dto.response.SolicitudResponse;
-import edu.dosw.sirha.exception.BusinessException;
-import edu.dosw.sirha.exception.ResourceNotFoundException;
-import edu.dosw.sirha.mapper.SolicitudMapper;
-import edu.dosw.sirha.model.Solicitud;
-import edu.dosw.sirha.model.SolicitudHistorialEntry;
-import edu.dosw.sirha.model.enums.SolicitudEstado;
-import edu.dosw.sirha.repository.SolicitudRepository;
-import edu.dosw.sirha.service.impl.SolicitudServiceImpl;
-import edu.dosw.sirha.support.TestDataFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -25,14 +9,36 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import edu.dosw.sirha.dto.request.SolicitudRequest;
+import edu.dosw.sirha.dto.response.SolicitudResponse;
+import edu.dosw.sirha.exception.BusinessException;
+import edu.dosw.sirha.exception.ResourceNotFoundException;
+import edu.dosw.sirha.mapper.SolicitudMapper;
+import edu.dosw.sirha.model.Grupo;
+import edu.dosw.sirha.model.Periodo;
+import edu.dosw.sirha.model.Solicitud;
+import edu.dosw.sirha.model.SolicitudHistorialEntry;
+import edu.dosw.sirha.model.enums.SolicitudEstado;
+import edu.dosw.sirha.repository.GrupoRepository;
+import edu.dosw.sirha.repository.PeriodoRepository;
+import edu.dosw.sirha.repository.SolicitudRepository;
+import edu.dosw.sirha.service.impl.SolicitudServiceImpl;
+import edu.dosw.sirha.support.TestDataFactory;
 
 class SolicitudServiceTest {
 
     private SolicitudRepository solicitudRepository;
     private SolicitudMapper solicitudMapper;
+    private GrupoRepository grupoRepository;
+    private PeriodoRepository periodoRepository;
     private Clock fixedClock;
     private SolicitudServiceImpl solicitudService;
 
@@ -40,8 +46,10 @@ class SolicitudServiceTest {
     void setUp() {
         solicitudRepository = mock(SolicitudRepository.class);
         solicitudMapper = new SolicitudMapper();
+        grupoRepository = mock(GrupoRepository.class);
+        periodoRepository = mock(PeriodoRepository.class);
         fixedClock = Clock.fixed(Instant.parse("2024-01-10T12:00:00Z"), ZoneOffset.UTC);
-        solicitudService = new SolicitudServiceImpl(solicitudRepository, solicitudMapper, fixedClock);
+        solicitudService = new SolicitudServiceImpl(solicitudRepository, solicitudMapper, grupoRepository, periodoRepository, fixedClock);
         ReflectionTestUtils.setField(solicitudService, "diasMaxRespuesta", 5);
     }
 
@@ -49,6 +57,20 @@ class SolicitudServiceTest {
     void create_ShouldPersistSolicitudWithGeneratedCodigoAndFechas() {
         SolicitudRequest request = TestDataFactory.buildSolicitudRequest();
         ArgumentCaptor<Solicitud> captor = ArgumentCaptor.forClass(Solicitud.class);
+
+        // Mock período activo
+        Periodo periodoActivo = TestDataFactory.buildPeriodo();
+        periodoActivo.setActivo(true);
+        periodoActivo.setFechaLimiteSolicitudes(Instant.now(fixedClock).plusSeconds(86400)); // 1 día después
+        when(periodoRepository.findByActivoTrue()).thenReturn(Optional.of(periodoActivo));
+
+        // Mock grupo con cupos disponibles si se especifica
+        if (request.getGrupoDestinoId() != null) {
+            Grupo grupoDestino = TestDataFactory.buildGrupo();
+            grupoDestino.setCupoMax(30);
+            grupoDestino.setCuposActuales(20);
+            when(grupoRepository.findById(request.getGrupoDestinoId())).thenReturn(Optional.of(grupoDestino));
+        }
 
         when(solicitudRepository.save(captor.capture())).thenAnswer(invocation -> {
             Solicitud saved = captor.getValue();
@@ -73,20 +95,29 @@ class SolicitudServiceTest {
     void update_ShouldMergeChangesAndCreateHistorialEntryWhenMissing() {
         Solicitud existing = TestDataFactory.buildSolicitud();
         existing.setHistorial(null);
+        // Mock existing grupo
+        Grupo grupoOrigen = TestDataFactory.buildGrupo();
+        when(grupoRepository.findById(existing.getGrupoDestinoId())).thenReturn(Optional.of(grupoOrigen));
+        
+        // Mock new grupo for update
+        Grupo grupoDestino = TestDataFactory.buildGrupo();
+        grupoDestino.setId("grp-9");
+        when(grupoRepository.findById("grp-9")).thenReturn(Optional.of(grupoDestino));
+        
         when(solicitudRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
         when(solicitudRepository.save(existing)).thenAnswer(invocation -> invocation.getArgument(0));
 
-    SolicitudRequest request = SolicitudRequest.builder()
-        .tipo(TestDataFactory.buildSolicitudRequest().getTipo())
-        .estudianteId("est-123")
-        .descripcion("Actualizada")
-        .observaciones("Nueva observación")
-        .inscripcionOrigenId("ins-1")
-        .grupoDestinoId("grp-9")
-        .materiaDestinoId("mat-9")
-        .periodoId("per-2024")
-        .prioridad(5)
-        .build();
+        SolicitudRequest request = SolicitudRequest.builder()
+                .tipo(TestDataFactory.buildSolicitudRequest().getTipo())
+                .estudianteId("est-123")
+                .descripcion("Actualizada")
+                .observaciones("Nueva observación")
+                .inscripcionOrigenId("ins-1")
+                .grupoDestinoId("grp-9")
+                .materiaDestinoId("mat-9")
+                .periodoId("per-2024")
+                .prioridad(5)
+                .build();
 
         SolicitudResponse response = solicitudService.update(existing.getId(), request);
 
@@ -101,7 +132,17 @@ class SolicitudServiceTest {
     void changeEstado_ShouldPersistWhenStateDifferent() {
         Solicitud solicitud = TestDataFactory.buildSolicitud();
         solicitud.setEstado(SolicitudEstado.PENDIENTE);
-    solicitud.setHistorial(new ArrayList<>(solicitud.getHistorial()));
+        solicitud.setHistorial(new ArrayList<>(solicitud.getHistorial()));
+        
+        // Mock período activo
+        Periodo periodoActivo = TestDataFactory.buildPeriodo();
+        periodoActivo.setActivo(true);
+        when(periodoRepository.findByActivoTrue()).thenReturn(Optional.of(periodoActivo));
+        
+        // Mock grupo destino
+        Grupo grupoDestino = TestDataFactory.buildGrupo();
+        when(grupoRepository.findById(solicitud.getGrupoDestinoId())).thenReturn(Optional.of(grupoDestino));
+        
         when(solicitudRepository.findById(solicitud.getId())).thenReturn(Optional.of(solicitud));
         when(solicitudRepository.save(solicitud)).thenAnswer(invocation -> invocation.getArgument(0));
 

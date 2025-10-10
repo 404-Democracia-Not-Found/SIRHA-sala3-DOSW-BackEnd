@@ -43,12 +43,12 @@ class GlobalExceptionHandlerTest {
                 GlobalExceptionHandlerTest.class.getDeclaredMethod("dummyMethod", String.class), 0);
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(parameter, bindingResult);
 
-    ResponseEntity<Map<String, Object>> response = handler.handleValidation(exception);
+        ResponseEntity<Map<String, Object>> response = handler.handleValidation(exception);
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(response.getBody()).containsKey("errors");
-    @SuppressWarnings("unchecked")
-    Map<String, String> errors = (Map<String, String>) response.getBody().get("errors");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).containsKey("validationErrors");
+        @SuppressWarnings("unchecked")
+        Map<String, String> errors = (Map<String, String>) response.getBody().get("validationErrors");
         assertThat(errors).containsEntry("estudianteId", "requerido");
     }
 
@@ -57,7 +57,8 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<Map<String, Object>> response = handler.handleGeneric(new RuntimeException("boom"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody()).containsEntry("message", "boom");
+        assertThat(response.getBody()).containsEntry("message", "Error interno del servidor");
+        assertThat(response.getBody()).containsEntry("errorCode", "SIRHA-500-001");
     }
 
     @SuppressWarnings("unused")
