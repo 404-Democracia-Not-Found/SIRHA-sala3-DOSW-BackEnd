@@ -30,3 +30,25 @@ target/*
 .env
 .env.local
 *.env
+application-local.yml
+application-dev.yml
+application-development.yml
+
+# Archivos de configuración con credenciales
+**/application-development.yml
+**/application-local.yml
+**/application-private.yml
+
+# IDE específicos
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs específicos del proyecto
+logs/
+sirha-backend.log
+
+# Archivos temporales
+*.tmp
+*.temp
