@@ -1,5 +1,9 @@
 name: Integración Continua
 
+permissions:
+  contents: read
+  checks: write
+
 on:
   push:
     branches:
