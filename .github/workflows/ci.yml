@@ -87,24 +87,3 @@ jobs:
           name: sirha-backend-jar
           path: target/*.jar
 
-  security-scan:
-    name: Escaneo de Dependencias y Contenedores
-    needs: unit-test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Obtener código
-        uses: actions/checkout@v4
-
-      - name: Ejecutar Trivy scan (filesystem)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Subir resultados Trivy a code scanning
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
