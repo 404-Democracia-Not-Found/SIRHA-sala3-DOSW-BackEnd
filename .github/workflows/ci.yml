@@ -15,6 +15,8 @@ jobs:
   unit-test:
     name: Test y Análisis de Calidad
     runs-on: ubuntu-latest
+    env:
+      SPRING_PROFILES_ACTIVE: test
 
     steps:
       - name: Obtener código
