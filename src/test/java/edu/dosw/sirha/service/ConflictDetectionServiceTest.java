@@ -8,7 +8,6 @@ import edu.dosw.sirha.repository.ConflictRepository;
 import edu.dosw.sirha.service.impl.ConflictDetectionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
