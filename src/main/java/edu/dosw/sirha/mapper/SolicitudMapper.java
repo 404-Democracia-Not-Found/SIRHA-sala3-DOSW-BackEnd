@@ -8,9 +8,27 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+/**
+ * Mapper para convertir entre {@link Solicitud}, {@link SolicitudRequest} y {@link SolicitudResponse}.
+ * 
+ * <p>Proporciona conversión bidireccional desacoplando la capa de presentación
+ * (DTOs) de la capa de dominio (entidades).</p>
+ * 
+ * @see Solicitud
+ * @see SolicitudRequest
+ * @see SolicitudResponse
+ */
 @Component
 public class SolicitudMapper {
 
+	/**
+	 * Convierte un SolicitudRequest a una nueva entidad Solicitud.
+	 * 
+	 * <p>Establece estado inicial como PENDIENTE.</p>
+	 * 
+	 * @param request DTO con datos de la solicitud
+	 * @return Nueva entidad Solicitud (sin ID)
+	 */
 	public Solicitud toNewEntity(SolicitudRequest request) {
 		if (request == null) {
 			return null;
@@ -30,6 +48,14 @@ public class SolicitudMapper {
 				.build();
 	}
 
+	/**
+	 * Actualiza una entidad Solicitud existente con datos de un request.
+	 * 
+	 * <p>No modifica ID ni estado (se gestionan por separado).</p>
+	 * 
+	 * @param entity Entidad existente a actualizar
+	 * @param request DTO con nuevos datos
+	 */
 	public void updateEntity(Solicitud entity, SolicitudRequest request) {
 		if (entity == null || request == null) {
 			return;
@@ -46,6 +72,12 @@ public class SolicitudMapper {
 		entity.setPrioridad(request.getPrioridad());
 	}
 
+	/**
+	 * Convierte una entidad Solicitud a SolicitudResponse.
+	 * 
+	 * @param solicitud Entidad de dominio
+	 * @return DTO para respuesta HTTP
+	 */
 	public SolicitudResponse toResponse(Solicitud solicitud) {
 		if (solicitud == null) {
 			return null;

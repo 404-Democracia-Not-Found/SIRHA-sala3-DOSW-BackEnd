@@ -5,9 +5,24 @@ import edu.dosw.sirha.dto.response.ConflictResponse;
 import edu.dosw.sirha.model.Conflict;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper para convertir entre {@link Conflict}, {@link ConflictRequest} y {@link ConflictResponse}.
+ * 
+ * @see Conflict
+ * @see ConflictRequest
+ * @see ConflictResponse
+ */
 @Component
 public class ConflictMapper {
 
+	/**
+	 * Convierte un ConflictRequest a una nueva entidad Conflict.
+	 * 
+	 * <p>Establece resuelto como false por defecto.</p>
+	 * 
+	 * @param request DTO con datos del conflicto
+	 * @return Nueva entidad Conflict (sin ID ni fecha detección)
+	 */
 	public Conflict toNewEntity(ConflictRequest request) {
 		if (request == null) {
 			return null;
@@ -24,6 +39,12 @@ public class ConflictMapper {
 				.build();
 	}
 
+	/**
+	 * Convierte una entidad Conflict a ConflictResponse.
+	 * 
+	 * @param conflict Entidad de dominio
+	 * @return DTO para respuesta HTTP
+	 */
 	public ConflictResponse toResponse(Conflict conflict) {
 		if (conflict == null) {
 			return null;
