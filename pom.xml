@@ -231,6 +231,10 @@
 				<version>3.2.5</version>
 				<configuration>
 					<useModulePath>false</useModulePath>
+					<!-- Ensure forked test JVMs receive the test profile during CI -->
+					<systemPropertyVariables>
+						<spring.profiles.active>test</spring.profiles.active>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 		</plugins>
