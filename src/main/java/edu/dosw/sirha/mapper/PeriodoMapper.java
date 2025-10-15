@@ -5,9 +5,22 @@ import edu.dosw.sirha.dto.response.PeriodoResponse;
 import edu.dosw.sirha.model.Periodo;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper para convertir entre {@link Periodo}, {@link PeriodoRequest} y {@link PeriodoResponse}.
+ * 
+ * @see Periodo
+ * @see PeriodoRequest
+ * @see PeriodoResponse
+ */
 @Component
 public class PeriodoMapper {
 
+    /**
+     * Convierte un PeriodoRequest a una nueva entidad Periodo.
+     * 
+     * @param request DTO con datos del periodo
+     * @return Nueva entidad Periodo (sin ID)
+     */
     public Periodo toEntity(PeriodoRequest request) {
         if (request == null) {
             return null;
@@ -25,6 +38,12 @@ public class PeriodoMapper {
                 .build();
     }
 
+    /**
+     * Actualiza una entidad Periodo existente con datos de un request.
+     * 
+     * @param entity Entidad existente a actualizar
+     * @param request DTO con nuevos datos
+     */
     public void updateEntity(Periodo entity, PeriodoRequest request) {
         if (entity == null || request == null) {
             return;
@@ -40,6 +59,12 @@ public class PeriodoMapper {
         entity.setConfiguracion(request.getConfiguracion());
     }
 
+    /**
+     * Convierte una entidad Periodo a PeriodoResponse.
+     * 
+     * @param periodo Entidad de dominio
+     * @return DTO para respuesta HTTP
+     */
     public PeriodoResponse toResponse(Periodo periodo) {
         if (periodo == null) {
             return null;

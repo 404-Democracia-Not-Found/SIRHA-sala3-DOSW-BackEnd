@@ -9,6 +9,26 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Suite de pruebas unitarias para {@link UserPrincipal}.
+ * 
+ * <p>Verifica el correcto funcionamiento del adaptador entre la entidad {@link User} de SIRHA
+ * y la interfaz {@link org.springframework.security.core.userdetails.UserDetails} de Spring Security,
+ * incluyendo conversión de roles, manejo de estados de cuenta, y mapeo de credenciales.</p>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li><strong>Authorities:</strong> conversión de {@link Rol} a GrantedAuthority con prefijo "ROLE_"</li>
+ *   <li><strong>Rol por defecto:</strong> asignación de ROLE_USER cuando rol es null</li>
+ *   <li><strong>Username:</strong> mapeo de email como username</li>
+ *   <li><strong>Password:</strong> mapeo de passwordHash</li>
+ *   <li><strong>Enabled:</strong> mapeo del campo activo</li>
+ *   <li><strong>Account flags:</strong> verificación de expired, locked, credentials expired</li>
+ * </ul>
+ * 
+ * @see UserPrincipal
+ * @see org.springframework.security.core.userdetails.UserDetails
+ */
 class UserPrincipalTest {
 
     @Test

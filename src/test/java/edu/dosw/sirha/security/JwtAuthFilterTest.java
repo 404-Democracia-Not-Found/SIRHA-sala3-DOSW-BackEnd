@@ -28,6 +28,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Suite de pruebas unitarias para {@link JwtAuthFilter}.
+ * 
+ * <p>Verifica el correcto funcionamiento del filtro de autenticación JWT en la cadena
+ * de filtros de Spring Security, incluyendo extracción de tokens, validación,
+ * establecimiento del contexto de seguridad, y manejo de peticiones sin token.</p>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li><strong>Token válido:</strong> autenticación exitosa y contexto establecido</li>
+ *   <li><strong>Sin token:</strong> filtro pasa sin autenticar</li>
+ *   <li><strong>Token inválido:</strong> rechazo y limpieza de contexto</li>
+ *   <li><strong>Token expirado:</strong> manejo de ExpiredJwtException</li>
+ *   <li><strong>Header Authorization:</strong> extracción correcta con prefijo "Bearer "</li>
+ * </ul>
+ * 
+ * @see JwtAuthFilter
+ * @see JwtTokenService
+ * @see org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+ */
 @ExtendWith(MockitoExtension.class)
 class JwtAuthFilterTest {
 

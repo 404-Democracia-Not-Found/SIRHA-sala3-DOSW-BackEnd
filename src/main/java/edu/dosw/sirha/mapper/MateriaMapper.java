@@ -8,9 +8,22 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mapper para convertir entre {@link Materia}, {@link MateriaRequest} y {@link MateriaResponse}.
+ * 
+ * @see Materia
+ * @see MateriaRequest
+ * @see MateriaResponse
+ */
 @Component
 public class MateriaMapper {
 
+    /**
+     * Convierte un MateriaRequest a una nueva entidad Materia.
+     * 
+     * @param request DTO con datos de la materia
+     * @return Nueva entidad Materia (sin ID)
+     */
     public Materia toEntity(MateriaRequest request) {
         if (request == null) {
             return null;
@@ -32,6 +45,12 @@ public class MateriaMapper {
                 .build();
     }
 
+    /**
+     * Actualiza una entidad Materia existente con datos de un request.
+     * 
+     * @param entity Entidad existente a actualizar
+     * @param request DTO con nuevos datos
+     */
     public void updateEntity(Materia entity, MateriaRequest request) {
         if (entity == null || request == null) {
             return;
@@ -50,6 +69,12 @@ public class MateriaMapper {
         entity.setSearchTerms(safeCopy(request.getSearchTerms()));
     }
 
+    /**
+     * Convierte una entidad Materia a MateriaResponse.
+     * 
+     * @param materia Entidad de dominio
+     * @return DTO para respuesta HTTP
+     */
     public MateriaResponse toResponse(Materia materia) {
         if (materia == null) {
             return null;
@@ -72,7 +97,15 @@ public class MateriaMapper {
                 .build();
     }
 
-    private List<String> safeCopy(List<String> source) {
-        return source == null ? new ArrayList<>() : new ArrayList<>(source);
+    /**
+     * Crea una copia segura de una lista de Strings.
+     * 
+     * <p>Evita NullPointerException y referencias compartidas.</p>
+     * 
+     * @param list Lista a copiar
+     * @return Nueva lista con mismo contenido, o lista vacía si null
+     */
+    private List<String> safeCopy(List<String> list) {
+        return list == null ? new ArrayList<>() : new ArrayList<>(list);
     }
 }

@@ -21,6 +21,42 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Suite de pruebas unitarias para {@link InitialAdminLoader}.
+ * 
+ * <p>Esta clase verifica el correcto funcionamiento del loader que crea automáticamente
+ * el usuario administrador por defecto al iniciar la aplicación, incluyendo la lógica
+ * de detección de existencia y encriptación de contraseña.</p>
+ * 
+ * <p><strong>Configuración de pruebas:</strong></p>
+ * <ul>
+ *   <li>Usa {@code @ExtendWith(MockitoExtension.class)} para inyección de mocks</li>
+ *   <li>Mockea {@link UserRepository} para verificar operaciones de persistencia</li>
+ *   <li>Mockea {@link PasswordEncoder} para validar encriptación de contraseña</li>
+ *   <li>Clock fijo para timestamps determinísticos</li>
+ * </ul>
+ * 
+ * <p><strong>Escenarios probados:</strong></p>
+ * <ul>
+ *   <li><strong>Creación inicial:</strong> cuando no existe admin, se crea con datos por defecto</li>
+ *   <li><strong>Idempotencia:</strong> si ya existe admin, no se crea duplicado</li>
+ *   <li><strong>Encriptación:</strong> contraseña se encripta antes de guardar</li>
+ *   <li><strong>Valores por defecto:</strong> email, nombre, rol ADMIN, estado activo</li>
+ *   <li><strong>Timestamps:</strong> createdAt se establece correctamente</li>
+ * </ul>
+ * 
+ * <p><strong>Datos de administrador por defecto:</strong></p>
+ * <ul>
+ *   <li>Email: admin@sirha.local</li>
+ *   <li>Contraseña: Admin123! (encriptada con BCrypt)</li>
+ *   <li>Nombre: Administrador del Sistema</li>
+ *   <li>Rol: ADMIN</li>
+ *   <li>Estado: activo (true)</li>
+ * </ul>
+ * 
+ * @see InitialAdminLoader
+ * @see org.springframework.boot.CommandLineRunner
+ */
 @ExtendWith(MockitoExtension.class)
 class InitialAdminLoaderTest {
 

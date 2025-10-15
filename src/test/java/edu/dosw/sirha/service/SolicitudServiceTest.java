@@ -33,6 +33,45 @@ import edu.dosw.sirha.repository.SolicitudRepository;
 import edu.dosw.sirha.service.impl.SolicitudServiceImpl;
 import edu.dosw.sirha.support.TestDataFactory;
 
+/**
+ * Suite de pruebas unitarias para {@link SolicitudService} (implementación {@link SolicitudServiceImpl}).
+ * 
+ * <p>Esta clase verifica la lógica de negocio completa del servicio de solicitudes, incluyendo
+ * creación con validaciones, cambios de estado con historial, actualización de grupos,
+ * consultas filtradas y manejo de excepciones de negocio.</p>
+ * 
+ * <p><strong>Configuración de pruebas:</strong></p>
+ * <ul>
+ *   <li>Usa mocks puros (Mockito) sin Spring Context para mayor rapidez</li>
+ *   <li>Clock fijo para timestamps determinísticos en historial</li>
+ *   <li>TestDataFactory para crear datos de prueba consistentes</li>
+ *   <li>Setup completo en {@code @BeforeEach} con repositorios mockeados</li>
+ * </ul>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li><strong>Creación:</strong> solicitudes válidas, validación de periodo activo, grupos existentes</li>
+ *   <li><strong>Cambios de estado:</strong> transiciones válidas, registro de historial, actualización de timestamps</li>
+ *   <li><strong>Aprobación:</strong> actualización de cupo en grupos, sincronización de estados</li>
+ *   <li><strong>Consultas:</strong> filtrado por estudiante, periodo, estado; paginación</li>
+ *   <li><strong>Excepciones:</strong> recursos no encontrados, validaciones de negocio</li>
+ *   <li><strong>Actualización:</strong> modificación de grupos, preservación de estado e historial</li>
+ *   <li><strong>Eliminación:</strong> lógica de borrado según estado</li>
+ * </ul>
+ * 
+ * <p><strong>Validaciones de negocio verificadas:</strong></p>
+ * <ul>
+ *   <li>Solo se puede crear solicitudes en periodos activos</li>
+ *   <li>Grupos deben existir y pertenecer al periodo</li>
+ *   <li>Cambios de estado deben respetar transiciones válidas</li>
+ *   <li>Aprobación actualiza cupo actual de grupos</li>
+ *   <li>Historial registra todos los cambios de estado</li>
+ * </ul>
+ * 
+ * @see SolicitudService
+ * @see SolicitudServiceImpl
+ * @see org.junit.jupiter.api.Test
+ */
 class SolicitudServiceTest {
 
     private SolicitudRepository solicitudRepository;

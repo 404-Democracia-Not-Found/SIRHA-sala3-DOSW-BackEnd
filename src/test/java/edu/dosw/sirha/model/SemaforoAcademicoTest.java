@@ -4,6 +4,26 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Suite de pruebas unitarias para {@link SemaforoAcademico}.
+ * 
+ * <p>Verifica el correcto cálculo del porcentaje de avance académico del estudiante
+ * basado en materias aprobadas, en progreso y perdidas.</p>
+ * 
+ * <p><strong>Métodos probados:</strong></p>
+ * <ul>
+ *   <li>{@code porcentajeAvance()} - Calcula ratio de materias aprobadas sobre el total</li>
+ * </ul>
+ * 
+ * <p><strong>Escenarios verificados:</strong></p>
+ * <ul>
+ *   <li>Cálculo con múltiples materias en diferentes estados</li>
+ *   <li>Caso especial: sin materias (retorna 0)</li>
+ *   <li>Setters y getters de Lombok funcionan correctamente</li>
+ * </ul>
+ * 
+ * @see SemaforoAcademico
+ */
 class SemaforoAcademicoTest {
 
     @Test

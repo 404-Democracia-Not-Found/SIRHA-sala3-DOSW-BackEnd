@@ -20,6 +20,30 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Suite de pruebas unitarias para {@link SecurityConfig}.
+ * 
+ * <p>Verifica la correcta configuración de beans de seguridad de Spring Security,
+ * incluyendo UserDetailsService, AuthenticationProvider y PasswordEncoder.</p>
+ * 
+ * <p><strong>Beans probados:</strong></p>
+ * <ul>
+ *   <li>{@code userDetailsService()} - Carga usuarios por email desde base de datos</li>
+ *   <li>{@code authenticationProvider()} - Configura autenticación con DAO</li>
+ *   <li>{@code passwordEncoder()} - Verifica uso de BCrypt</li>
+ * </ul>
+ * 
+ * <p><strong>Casos verificados:</strong></p>
+ * <ul>
+ *   <li>Carga exitosa de usuario existente por email</li>
+ *   <li>Lanzamiento de {@link ResourceNotFoundException} si usuario no existe</li>
+ *   <li>AuthenticationProvider configurado correctamente con UserDetailsService y PasswordEncoder</li>
+ *   <li>Conversión de {@link User} a {@link UserPrincipal}</li>
+ * </ul>
+ * 
+ * @see SecurityConfig
+ * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+ */
 class SecurityConfigTest {
 
     private PasswordEncoder passwordEncoder;

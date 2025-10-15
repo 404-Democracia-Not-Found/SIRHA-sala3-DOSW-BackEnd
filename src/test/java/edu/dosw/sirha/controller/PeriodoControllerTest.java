@@ -30,6 +30,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Suite de pruebas unitarias para {@link PeriodoController}.
+ * 
+ * <p>Verifica el correcto funcionamiento de los endpoints REST para la gestión de periodos
+ * académicos, incluyendo creación, activación, listado y consulta del periodo activo actual.</p>
+ * 
+ * <p><strong>Endpoints probados:</strong></p>
+ * <ul>
+ *   <li>POST /api/periodos - Creación de nuevos periodos académicos</li>
+ *   <li>GET /api/periodos - Listado de todos los periodos</li>
+ *   <li>GET /api/periodos/activo - Consulta del periodo activo actual</li>
+ *   <li>POST /api/periodos/{id}/activar - Activación de periodo específico</li>
+ * </ul>
+ * 
+ * @see PeriodoController
+ * @see PeriodoService
+ */
 @WebMvcTest(controllers = PeriodoController.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
