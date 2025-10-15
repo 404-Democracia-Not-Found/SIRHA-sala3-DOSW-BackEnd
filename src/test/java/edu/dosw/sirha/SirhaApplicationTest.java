@@ -24,7 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 
  * @see org.springframework.boot.test.context.SpringBootTest
  */
-@SpringBootTest
+@SpringBootTest(properties = "spring.autoconfigure.exclude=de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration")
 class SirhaApplicationTest {
 
 	/**
