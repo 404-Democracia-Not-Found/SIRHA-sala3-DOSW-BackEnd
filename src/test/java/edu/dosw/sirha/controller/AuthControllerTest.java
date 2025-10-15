@@ -37,6 +37,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Suite de pruebas unitarias para {@link AuthController}.
+ * 
+ * <p>Esta clase verifica el correcto funcionamiento del endpoint de autenticación,
+ * incluyendo login exitoso, manejo de usuarios inactivos, credenciales inválidas,
+ * generación de tokens JWT y validación de la estructura de respuestas.</p>
+ * 
+ * <p><strong>Configuración de pruebas:</strong></p>
+ * <ul>
+ *   <li>Usa {@code @WebMvcTest} para cargar solo el controlador bajo prueba</li>
+ *   <li>Deshabilita filtros de seguridad con {@code addFilters = false}</li>
+ *   <li>Importa configuración de test con clock fijo para timestamps determinísticos</li>
+ *   <li>Mockea AuthenticationManager, UserRepository y JwtTokenService</li>
+ * </ul>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li>Login exitoso con credenciales válidas</li>
+ *   <li>Rechazo de usuarios inactivos</li>
+ *   <li>Manejo de credenciales incorrectas</li>
+ *   <li>Generación y formato de tokens JWT</li>
+ *   <li>Validación de campos en respuestas</li>
+ * </ul>
+ * 
+ * @see AuthController
+ * @see org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+ */
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @Import(AuthControllerTest.AuthControllerTestConfig.class)

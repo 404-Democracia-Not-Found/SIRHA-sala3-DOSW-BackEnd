@@ -36,6 +36,44 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Suite de pruebas unitarias para {@link SolicitudController}.
+ * 
+ * <p>Esta clase verifica el correcto funcionamiento de todos los endpoints REST relacionados
+ * con la gestión de solicitudes académicas, incluyendo operaciones CRUD completas, cambios de
+ * estado, consultas con filtros y manejo de errores.</p>
+ * 
+ * <p><strong>Configuración de pruebas:</strong></p>
+ * <ul>
+ *   <li>Usa {@code @WebMvcTest} para cargar solo el controlador bajo prueba</li>
+ *   <li>Excluye SecurityConfig y JwtAuthFilter para simplificar tests</li>
+ *   <li>Mockea {@link SolicitudService} para aislar la capa de controlador</li>
+ *   <li>Usa MockMvc para simular peticiones HTTP reales</li>
+ * </ul>
+ * 
+ * <p><strong>Endpoints probados:</strong></p>
+ * <ul>
+ *   <li>POST /api/solicitudes - Creación de solicitudes</li>
+ *   <li>GET /api/solicitudes - Listado con filtros opcionales</li>
+ *   <li>GET /api/solicitudes/{id} - Consulta individual</li>
+ *   <li>PUT /api/solicitudes/{id} - Actualización completa</li>
+ *   <li>PATCH /api/solicitudes/{id}/estado - Cambio de estado</li>
+ *   <li>DELETE /api/solicitudes/{id} - Eliminación</li>
+ * </ul>
+ * 
+ * <p><strong>Aspectos verificados:</strong></p>
+ * <ul>
+ *   <li>Códigos de estado HTTP correctos (200, 201, 204, 400, 404)</li>
+ *   <li>Estructura y contenido de respuestas JSON</li>
+ *   <li>Serialización/deserialización de DTOs</li>
+ *   <li>Validación de parámetros de consulta</li>
+ *   <li>Manejo de excepciones del servicio</li>
+ * </ul>
+ * 
+ * @see SolicitudController
+ * @see SolicitudService
+ * @see org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+ */
 @WebMvcTest(controllers = SolicitudController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),

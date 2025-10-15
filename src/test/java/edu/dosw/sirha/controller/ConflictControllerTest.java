@@ -29,6 +29,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Suite de pruebas unitarias para {@link ConflictController}.
+ * 
+ * <p>Verifica el correcto funcionamiento de los endpoints REST para la detección y gestión
+ * de conflictos académicos (horarios, cupos, requisitos), incluyendo detección, consulta
+ * por estudiante/solicitud, y marcado de conflictos como resueltos.</p>
+ * 
+ * <p><strong>Endpoints probados:</strong></p>
+ * <ul>
+ *   <li>POST /api/conflicts/detect - Detección automática de conflictos</li>
+ *   <li>GET /api/conflicts/estudiante/{id} - Conflictos de un estudiante</li>
+ *   <li>GET /api/conflicts/solicitud/{id} - Conflictos de una solicitud</li>
+ *   <li>PUT /api/conflicts/{id}/resolver - Marcar conflicto como resuelto</li>
+ * </ul>
+ * 
+ * @see ConflictController
+ * @see ConflictDetectionService
+ */
 @WebMvcTest(controllers = ConflictController.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),

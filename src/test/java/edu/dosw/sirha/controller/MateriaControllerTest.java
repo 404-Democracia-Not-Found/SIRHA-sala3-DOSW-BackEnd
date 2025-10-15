@@ -29,6 +29,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Suite de pruebas unitarias para {@link MateriaController}.
+ * 
+ * <p>Verifica el correcto funcionamiento de los endpoints REST del catálogo de materias,
+ * incluyendo creación, listado general, búsqueda filtrada por facultad/semestre,
+ * y consulta individual de materias.</p>
+ * 
+ * <p><strong>Endpoints probados:</strong></p>
+ * <ul>
+ *   <li>POST /api/materias - Creación de materias en el catálogo</li>
+ *   <li>GET /api/materias - Listado completo de materias</li>
+ *   <li>GET /api/materias/search - Búsqueda por facultad y/o semestre</li>
+ *   <li>GET /api/materias/{id} - Consulta de materia específica</li>
+ * </ul>
+ * 
+ * @see MateriaController
+ * @see MateriaService
+ */
 @WebMvcTest(controllers = MateriaController.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
