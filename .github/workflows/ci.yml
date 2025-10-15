@@ -37,7 +37,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Verificar proyecto (tests + cobertura)
-        run: mvn -B verify jacoco:report
+        run: mvn -B -Dspring.profiles.active=test verify jacoco:report
 
       - name: Publicar reporte de pruebas Maven
         uses: dorny/test-reporter@v1
