@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sirha}
+    username: ${DB_USERNAME:sirha}
+    password: ${DB_PASSWORD:changeme}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 4
+      connection-timeout: 30000
+      validation-timeout: 5000
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/sirha}
+      database: ${MONGODB_DATABASE:sirha}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    ssl: ${REDIS_SSL:false}
+
+sirha:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:changeme}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    edu.dosw.sirha: INFO

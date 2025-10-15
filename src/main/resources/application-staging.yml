@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: staging
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/sirha-staging}
+      database: ${MONGODB_DATABASE:sirha_preprod}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    ssl: ${REDIS_SSL:false}
+
+sirha:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:changeme-staging}
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
