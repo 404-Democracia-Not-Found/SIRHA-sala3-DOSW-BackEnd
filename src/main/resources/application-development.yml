@@ -8,8 +8,9 @@ spring:
       database: ${MONGODB_DATABASE:SIRHA}
 
 sirha:
-  jwt:
-    secret: ${JWT_SECRET:changeme-dev-secret-key-minimum-32-characters}
+  security:
+    jwt:
+      secret: ${JWT_SECRET:changeme-dev-secret-key-minimum-32-characters}
 
 logging:
   level:
