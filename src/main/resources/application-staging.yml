@@ -13,9 +13,9 @@ spring:
     ssl: ${REDIS_SSL:false}
 
 sirha:
-  jwt:
-    secret: ${JWT_SECRET:changeme-staging}
-
+  security:
+    jwt:
+      secret: ${JWT_SECRET:changeme-staging}
 logging:
   level:
     root: INFO
