@@ -92,9 +92,6 @@ public class MateriaRequest {
     /**
      * Indica si la materia está activa en el catálogo.
      */
-    /**
-     * Indica si la materia está activa en el catálogo.
-     */
     private Boolean activo;
 
     /**
