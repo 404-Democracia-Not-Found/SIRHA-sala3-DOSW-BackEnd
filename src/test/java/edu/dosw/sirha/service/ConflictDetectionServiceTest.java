@@ -8,6 +8,7 @@ import edu.dosw.sirha.repository.ConflictRepository;
 import edu.dosw.sirha.service.impl.ConflictDetectionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -24,6 +25,31 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Suite de pruebas unitarias para {@link ConflictDetectionService} (implementación {@link ConflictDetectionServiceImpl}).
+ * 
+ * <p>Verifica la lógica de detección automática de conflictos académicos (horarios, cupos, requisitos),
+ * incluyendo creación, consultas por estudiante/solicitud, y marcado de conflictos como resueltos.</p>
+ * 
+ * <p><strong>Tipos de conflictos detectados:</strong></p>
+ * <ul>
+ *   <li>Conflictos de horario (solapamiento de clases)</li>
+ *   <li>Cupos llenos en grupos</li>
+ *   <li>Requisitos previos no cumplidos</li>
+ *   <li>Límites de créditos excedidos</li>
+ * </ul>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li><strong>Creación:</strong> registro de conflictos detectados con timestamps</li>
+ *   <li><strong>Consultas:</strong> por estudiante, por solicitud, todos los conflictos</li>
+ *   <li><strong>Resolución:</strong> marcado de conflictos como resueltos con timestamp</li>
+ *   <li><strong>Actualización:</strong> modificación de descripción y detalles</li>
+ * </ul>
+ * 
+ * @see ConflictDetectionService
+ * @see ConflictDetectionServiceImpl
+ */
 @ExtendWith(MockitoExtension.class)
 class ConflictDetectionServiceTest {
 

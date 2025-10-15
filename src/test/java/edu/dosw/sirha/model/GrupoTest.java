@@ -11,6 +11,40 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Suite de pruebas unitarias para la entidad {@link Grupo}.
+ * 
+ * <p>Esta clase verifica el correcto funcionamiento de los métodos de negocio de la entidad
+ * Grupo, incluyendo gestión de cupos, detección de conflictos de horario, validación de
+ * disponibilidad y lógica de inscripción/retiro de estudiantes.</p>
+ * 
+ * <p><strong>Métodos de negocio probados:</strong></p>
+ * <ul>
+ *   <li>{@code tieneCuposDisponibles()} - Verifica si hay cupos libres</li>
+ *   <li>{@code calcularPorcentajeOcupacion()} - Calcula ocupación como porcentaje</li>
+ *   <li>{@code calcularCuposDisponibles()} - Retorna cantidad de cupos libres</li>
+ *   <li>{@code incrementarCupo()} - Aumenta cupo actual al inscribir estudiante</li>
+ *   <li>{@code decrementarCupo()} - Disminuye cupo actual al retirar estudiante</li>
+ *   <li>{@code tieneConflictoHorarioCon()} - Detecta solapamiento de horarios</li>
+ *   <li>{@code getTotalHorasSemanales()} - Suma horas de todos los horarios</li>
+ *   <li>{@code estaCerrado()} - Verifica si el grupo acepta inscripciones</li>
+ * </ul>
+ * 
+ * <p><strong>Escenarios verificados:</strong></p>
+ * <ul>
+ *   <li>Cupos disponibles y agotados</li>
+ *   <li>Cálculos de porcentaje de ocupación</li>
+ *   <li>Incremento/decremento de cupos con límites</li>
+ *   <li>Detección de conflictos por día y hora exactos</li>
+ *   <li>Conflictos en grupos con múltiples horarios</li>
+ *   <li>Suma correcta de horas semanales</li>
+ *   <li>Estado cerrado vs abierto para inscripciones</li>
+ * </ul>
+ * 
+ * @see Grupo
+ * @see Horario
+ * @see org.junit.jupiter.api.Test
+ */
 class GrupoTest {
 
     @Test

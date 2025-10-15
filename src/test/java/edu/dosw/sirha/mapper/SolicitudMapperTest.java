@@ -12,6 +12,41 @@ import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Suite de pruebas unitarias para {@link SolicitudMapper}.
+ * 
+ * <p>Esta clase verifica el correcto mapeo bidireccional entre entidades {@link Solicitud}
+ * y sus DTOs correspondientes ({@link SolicitudRequest} y {@link SolicitudResponse}),
+ * incluyendo creación de nuevas entidades, actualización parcial y conversión a respuestas.</p>
+ * 
+ * <p><strong>Métodos de mapeo probados:</strong></p>
+ * <ul>
+ *   <li>{@code toNewEntity(SolicitudRequest)} - Crea entidad desde request con estado PENDIENTE por defecto</li>
+ *   <li>{@code updateEntity(Solicitud, SolicitudRequest)} - Actualiza campos mutables preservando estado e historial</li>
+ *   <li>{@code toResponse(Solicitud)} - Convierte entidad a DTO de respuesta con todos los campos</li>
+ * </ul>
+ * 
+ * <p><strong>Aspectos verificados:</strong></p>
+ * <ul>
+ *   <li><strong>Creación:</strong> todos los campos del request son mapeados, estado inicial es PENDIENTE</li>
+ *   <li><strong>Actualización:</strong> campos mutables se actualizan, estado e historial no cambian</li>
+ *   <li><strong>Respuesta:</strong> todos los campos de la entidad aparecen en el DTO de respuesta</li>
+ *   <li><strong>Nulls:</strong> manejo correcto de campos opcionales nulos</li>
+ *   <li><strong>Colecciones:</strong> listas de grupos se copian correctamente</li>
+ * </ul>
+ * 
+ * <p><strong>Datos de prueba:</strong></p>
+ * <ul>
+ *   <li>Usa {@link TestDataFactory} para generar datos consistentes</li>
+ *   <li>Verifica que los IDs se preservan o no según el método</li>
+ *   <li>Confirma que timestamps y historial no se modifican en updates</li>
+ * </ul>
+ * 
+ * @see SolicitudMapper
+ * @see Solicitud
+ * @see SolicitudRequest
+ * @see SolicitudResponse
+ */
 class SolicitudMapperTest {
 
     private SolicitudMapper mapper;

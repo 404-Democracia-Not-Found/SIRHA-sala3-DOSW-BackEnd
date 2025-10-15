@@ -28,6 +28,25 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Suite de pruebas unitarias para {@link PeriodoService} (implementación {@link PeriodoServiceImpl}).
+ * 
+ * <p>Verifica la lógica de negocio del servicio de periodos académicos, incluyendo creación,
+ * activación exclusiva (solo un periodo activo a la vez), consultas, y validaciones de
+ * reglas de negocio relacionadas con ventanas de tiempo.</p>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li><strong>Creación:</strong> periodos con fechas válidas, configuración inicial</li>
+ *   <li><strong>Activación:</strong> desactivación automática del periodo activo previo</li>
+ *   <li><strong>Consulta activo:</strong> obtención del periodo actualmente vigente</li>
+ *   <li><strong>Validaciones:</strong> fechas coherentes, solapamiento de periodos</li>
+ *   <li><strong>Excepciones:</strong> BusinessException si no hay periodo activo o fechas inválidas</li>
+ * </ul>
+ * 
+ * @see PeriodoService
+ * @see PeriodoServiceImpl
+ */
 @ExtendWith(MockitoExtension.class)
 class PeriodoServiceTest {
 

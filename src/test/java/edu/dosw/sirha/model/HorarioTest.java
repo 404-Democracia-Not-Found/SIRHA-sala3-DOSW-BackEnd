@@ -7,6 +7,32 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Suite de pruebas unitarias para la entidad {@link Horario}.
+ * 
+ * <p>Verifica la lógica de validación de horarios académicos y detección de conflictos
+ * de tiempo, incluyendo horarios válidos e inválidos, solapamientos totales y parciales,
+ * y casos especiales como horarios consecutivos sin conflicto.</p>
+ * 
+ * <p><strong>Métodos probados:</strong></p>
+ * <ul>
+ *   <li>{@code esHorarioValido()} - Valida horarios dentro de rangos permitidos</li>
+ *   <li>{@code tieneSolapamientoConHorario()} - Detecta conflictos de tiempo</li>
+ *   <li>{@code calcularDuracionHoras()} - Calcula duración en horas decimales</li>
+ * </ul>
+ * 
+ * <p><strong>Escenarios verificados:</strong></p>
+ * <ul>
+ *   <li>Horarios válidos en días de semana (Lun-Vie 6AM-10PM)</li>
+ *   <li>Horarios válidos sábados (6AM-1PM)</li>
+ *   <li>Horarios inválidos (fuera de rango, domingos)</li>
+ *   <li>Solapamientos totales y parciales</li>
+ *   <li>Horarios en días diferentes (sin conflicto)</li>
+ *   <li>Horarios consecutivos sin solapamiento</li>
+ * </ul>
+ * 
+ * @see Horario
+ */
 class HorarioTest {
 
     @Test

@@ -24,6 +24,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Suite de pruebas unitarias para {@link MateriaService} (implementación {@link MateriaServiceImpl}).
+ * 
+ * <p>Verifica la lógica de negocio del servicio de catálogo de materias, incluyendo CRUD completo,
+ * búsqueda por criterios, y manejo de excepciones para recursos no encontrados.</p>
+ * 
+ * <p><strong>Casos de prueba cubiertos:</strong></p>
+ * <ul>
+ *   <li><strong>Creación:</strong> materias con todos los campos, mapeo correcto a entidad</li>
+ *   <li><strong>Consulta:</strong> por ID, listado completo, búsqueda por facultad/semestre</li>
+ *   <li><strong>Actualización:</strong> modificación de campos preservando ID</li>
+ *   <li><strong>Eliminación:</strong> borrado lógico o físico según estado</li>
+ *   <li><strong>Excepciones:</strong> ResourceNotFoundException cuando no existe materia</li>
+ * </ul>
+ * 
+ * @see MateriaService
+ * @see MateriaServiceImpl
+ */
 @ExtendWith(MockitoExtension.class)
 class MateriaServiceTest {
 
