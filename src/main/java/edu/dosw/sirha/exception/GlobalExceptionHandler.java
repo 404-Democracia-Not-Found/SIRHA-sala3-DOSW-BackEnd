@@ -12,6 +12,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manejador global de excepciones para el sistema SIRHA.
@@ -65,6 +69,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Códigos de error específicos para SIRHA
     
@@ -205,8 +211,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_INTERNAL, 
-                "Error interno del servidor");
+    // Registrar el error completo en logs para diagnóstico
+    log.error("Unhandled exception caught by GlobalExceptionHandler", ex);
+    return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_INTERNAL,
+        "Error interno del servidor");
     }
 
     /**
@@ -290,13 +298,13 @@ public class GlobalExceptionHandler {
      */
     private String getCurrentPath() {
         try {
-            return org.springframework.web.context.request.RequestContextHolder
-                    .currentRequestAttributes()
-                    .getAttribute(org.springframework.web.context.request.RequestAttributes.REFERENCE_REQUEST, 
-                            org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST)
-                    .toString();
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null && attrs.getRequest() != null) {
+                return attrs.getRequest().getRequestURI();
+            }
         } catch (Exception e) {
-            return "/api/unknown";
+            log.debug("Could not determine current request path", e);
         }
+        return "/api/unknown";
     }
 }
