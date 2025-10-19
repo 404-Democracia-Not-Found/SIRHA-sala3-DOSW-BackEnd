@@ -34,17 +34,23 @@ public class SecurityConfig {
 			AuthenticationProvider authenticationProvider,
 			JwtAuthFilter jwtAuthFilter) throws Exception {
 		http
-				.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers(
-								"/api/auth/**",
-								"/actuator/**",
-								"/v3/api-docs/**",
-								"/swagger-ui/**",
-								"/swagger-ui.html")
-						.permitAll()
-						.anyRequest()
-						.authenticated())
+		.csrf(csrf -> csrf.disable())
+		.authorizeHttpRequests(auth -> auth
+			.requestMatchers(
+				"/",
+				"/index.html",
+				"/favicon.ico",
+				"/css/**",
+				"/js/**",
+				"/images/**",
+				"/api/auth/**",
+				"/actuator/**",
+				"/v3/api-docs/**",
+				"/swagger-ui/**",
+				"/swagger-ui.html")
+			.permitAll()
+			.anyRequest()
+			.authenticated())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
