@@ -26,6 +26,13 @@ jobs:
       - name: Construir paquete (Maven)
         run: mvn -B -DskipTests package
 
+      - name: Debug - listar JARs generados
+        run: |
+          echo "Listando archivos .jar en el workspace (para depuración):"
+          find . -type f -name "*.jar" -print || true
+          echo "Listado del directorio target en la raíz (si existe):"
+          ls -la target || true
+
       - name: Verificar conexión a MongoDB
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
@@ -49,4 +56,4 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: target/*.jarcd     
+          package: '**/target/*.jar'
