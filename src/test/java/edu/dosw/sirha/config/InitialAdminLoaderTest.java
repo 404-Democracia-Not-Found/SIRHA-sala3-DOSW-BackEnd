@@ -11,57 +11,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.Clock;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
 
 /**
- * Suite de pruebas unitarias para {@link InitialAdminLoader}.
+ * Tests unitarios para {@link InitialAdminLoader}.
  * 
- * <p>Esta clase verifica el correcto funcionamiento del loader que crea automáticamente
- * el usuario administrador por defecto al iniciar la aplicación, incluyendo la lógica
- * de detección de existencia y encriptación de contraseña.</p>
- * 
- * <p><strong>Configuración de pruebas:</strong></p>
- * <ul>
- *   <li>Usa {@code @ExtendWith(MockitoExtension.class)} para inyección de mocks</li>
- *   <li>Mockea {@link UserRepository} para verificar operaciones de persistencia</li>
- *   <li>Mockea {@link PasswordEncoder} para validar encriptación de contraseña</li>
- *   <li>Clock fijo para timestamps determinísticos</li>
- * </ul>
- * 
- * <p><strong>Escenarios probados:</strong></p>
- * <ul>
- *   <li><strong>Creación inicial:</strong> cuando no existe admin, se crea con datos por defecto</li>
- *   <li><strong>Idempotencia:</strong> si ya existe admin, no se crea duplicado</li>
- *   <li><strong>Encriptación:</strong> contraseña se encripta antes de guardar</li>
- *   <li><strong>Valores por defecto:</strong> email, nombre, rol ADMIN, estado activo</li>
- *   <li><strong>Timestamps:</strong> createdAt se establece correctamente</li>
- * </ul>
- * 
- * <p><strong>Datos de administrador por defecto:</strong></p>
- * <ul>
- *   <li>Email: admin@sirha.local</li>
- *   <li>Contraseña: Admin123! (encriptada con BCrypt)</li>
- *   <li>Nombre: Administrador del Sistema</li>
- *   <li>Rol: ADMIN</li>
- *   <li>Estado: activo (true)</li>
- * </ul>
- * 
- * @see InitialAdminLoader
- * @see org.springframework.boot.CommandLineRunner
+ * <p>Verifica el comportamiento del componente de inicialización de usuarios por defecto,
+ * incluyendo la creación de múltiples usuarios para diferentes roles.</p>
  */
 @ExtendWith(MockitoExtension.class)
 class InitialAdminLoaderTest {
-
-    private static final String DEFAULT_EMAIL = "admin@sirha.local";
-    private static final String RAW_PASSWORD = "Admin123!";
 
     @Mock
     private UserRepository userRepository;
@@ -70,44 +36,120 @@ class InitialAdminLoaderTest {
     private PasswordEncoder passwordEncoder;
 
     private Clock clock;
-
     private InitialAdminLoader loader;
-
-    private Instant now;
+    private static final Instant FIXED_NOW = Instant.parse("2024-06-15T10:00:00Z");
 
     @BeforeEach
     void setUp() {
-        now = Instant.parse("2025-10-01T15:00:00Z");
-        clock = Clock.fixed(now, ZoneOffset.UTC);
+        clock = Clock.fixed(FIXED_NOW, ZoneOffset.UTC);
         loader = new InitialAdminLoader(userRepository, passwordEncoder, clock);
+        
+        // Configurar comportamiento por defecto del passwordEncoder con lenient
+        lenient().when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> "hashed_" + invocation.getArgument(0));
     }
 
     @Test
-    void shouldCreateDefaultAdminWhenDoesNotExist() {
-        when(userRepository.existsByEmail(DEFAULT_EMAIL)).thenReturn(false);
-        when(passwordEncoder.encode(RAW_PASSWORD)).thenReturn("hashed-password");
+    void runShouldCreateAllDefaultUsersWhenNoneExist() throws Exception {
+        // Arrange: Simular que ningún usuario existe
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
 
+        // Act
         loader.run();
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(captor.capture());
-        User savedUser = captor.getValue();
-
-        assertThat(savedUser.getNombre()).isEqualTo("Administrador");
-        assertThat(savedUser.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(savedUser.getPasswordHash()).isEqualTo("hashed-password");
-        assertThat(savedUser.getRol()).isEqualTo(Rol.ADMIN);
-        assertThat(savedUser.isActivo()).isTrue();
-        assertThat(savedUser.getCreadoEn()).isEqualTo(now);
-        assertThat(savedUser.getActualizadoEn()).isEqualTo(now);
+        // Assert: Verificar que se intentó crear 4 usuarios (uno por cada rol)
+        verify(userRepository, times(4)).save(any(User.class));
+        
+        // Capturar todos los usuarios guardados
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, times(4)).save(userCaptor.capture());
+        
+        var savedUsers = userCaptor.getAllValues();
+        assertThat(savedUsers).hasSize(4);
+        
+        // Verificar que se crearon usuarios para cada rol
+        assertThat(savedUsers).extracting(User::getRol)
+                .containsExactlyInAnyOrder(Rol.ADMIN, Rol.COORDINADOR, Rol.DOCENTE, Rol.ESTUDIANTE);
+        
+        // Verificar que todos están activos
+        assertThat(savedUsers).allMatch(User::isActivo);
     }
 
     @Test
-    void shouldNotCreateAdminIfAlreadyExists() {
-        when(userRepository.existsByEmail(DEFAULT_EMAIL)).thenReturn(true);
+    void runShouldCreateAdminUserWithCorrectCredentials() throws Exception {
+        // Arrange
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
 
+        // Act
         loader.run();
 
+        // Assert
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, atLeast(1)).save(userCaptor.capture());
+        
+        User adminUser = userCaptor.getAllValues().stream()
+                .filter(u -> u.getRol() == Rol.ADMIN)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(adminUser.getEmail()).isEqualTo("admin@sirha.local");
+        assertThat(adminUser.getNombre()).isEqualTo("Administrador Sistema");
+        assertThat(adminUser.getPasswordHash()).startsWith("hashed_");
+        assertThat(adminUser.isActivo()).isTrue();
+        assertThat(adminUser.getCreadoEn()).isEqualTo(FIXED_NOW);
+    }
+
+    @Test
+    void runShouldNotCreateUsersWhenTheyAlreadyExist() throws Exception {
+        // Arrange: Simular que todos los usuarios ya existen
+        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+
+        // Act
+        loader.run();
+
+        // Assert: No se debe guardar ningún usuario
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void runShouldCreateOnlyMissingUsers() throws Exception {
+        // Arrange: Simular que solo existe el admin
+        when(userRepository.existsByEmail("admin@sirha.local")).thenReturn(true);
+        when(userRepository.existsByEmail(argThat(email -> !email.equals("admin@sirha.local"))))
+                .thenReturn(false);
+
+        // Act
+        loader.run();
+
+        // Assert: Solo se deben crear 3 usuarios (todos excepto admin)
+        verify(userRepository, times(3)).save(any(User.class));
+        
+        // Verificar que no se creó el admin
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, times(3)).save(userCaptor.capture());
+        
+        assertThat(userCaptor.getAllValues())
+                .extracting(User::getRol)
+                .doesNotContain(Rol.ADMIN)
+                .containsExactlyInAnyOrder(Rol.COORDINADOR, Rol.DOCENTE, Rol.ESTUDIANTE);
+    }
+
+    @Test
+    void runShouldHashPasswordsBeforeSaving() throws Exception {
+        // Arrange
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(passwordEncoder.encode("Admin123!")).thenReturn("bcrypt_hash_admin");
+
+        // Act
+        loader.run();
+
+        // Assert
+        verify(passwordEncoder, atLeastOnce()).encode(anyString());
+        
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, atLeast(1)).save(userCaptor.capture());
+        
+        // Verificar que ninguna contraseña está en texto plano
+        assertThat(userCaptor.getAllValues())
+                .allMatch(user -> user.getPasswordHash().startsWith("hashed_") || user.getPasswordHash().startsWith("bcrypt_"));
     }
 }
