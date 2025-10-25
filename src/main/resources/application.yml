@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: sirha
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017}
+      database: ${MONGODB_DATABASE:SIRHA}
+  jackson:
+    default-property-inclusion: non_null
+  main:
+    banner-mode: off
+
+server:
+  port: ${SERVER_PORT:8081}
+  error:
+    include-message: always
+    include-binding-errors: always
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+  level:
+    root: INFO
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,threaddump,loggers
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+
+sirha:
+  security:
+    jwt:
+      issuer: sirha
+      expiration-minutes: 60
+      secret: ${JWT_SECRET:change-me}
+  solicitudes:
+    dias-max-respuesta: 5
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/sirha-test
+      database: sirha-test
+
+sirha:
+  security:
+    jwt:
+      secret: test-secret
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: WARN

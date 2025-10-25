@@ -1,0 +1,59 @@
+name: Despligue Continuo
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  deploy-to-azure:
+    name: Deploy to Azure Web App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Temurin JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Construir paquete (Maven)
+        run: mvn -B -DskipTests package
+
+      - name: Debug - listar JARs generados
+        run: |
+          echo "Listando archivos .jar en el workspace (para depuración):"
+          find . -type f -name "*.jar" -print || true
+          echo "Listado del directorio target en la raíz (si existe):"
+          ls -la target || true
+
+      - name: Verificar conexión a MongoDB
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+        run: |
+          if [ -z "${MONGO_URI}" ]; then
+            echo "ERROR: No se encontró el secreto MONGO_URI. Define MONGO_URI en Settings → Secrets.";
+            exit 1;
+          fi
+          echo "Intentando conectar a MongoDB con la URI proporcionada..."
+          # Ejecuta mongosh dentro de la imagen oficial de mongo y hace un ping al servidor
+          docker run --rm mongo:6.0 mongosh "${MONGO_URI}" --eval "db.adminCommand({ ping: 1 })" --quiet
+          status=$?
+          if [ $status -ne 0 ]; then
+            echo "ERROR: No se pudo conectar a MongoDB (mongosh devolvió código $status).";
+            exit $status;
+          fi
+          echo "Conexión a MongoDB verificada correctamente."
+
+      - name: Deploy to Azure Web App (publish profile)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: '**/target/*.jar'

@@ -1,0 +1,89 @@
+name: Integración Continua
+
+permissions:
+  contents: read
+  checks: write
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+env:
+  JAVA_VERSION: '17'
+
+jobs:
+  unit-test:
+    name: Test y Análisis de Calidad
+    runs-on: ubuntu-latest
+    env:
+      SPRING_PROFILES_ACTIVE: test
+
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Temurin JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Cachear dependencias de Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Verificar proyecto (tests + cobertura)
+        run: mvn -B -Dspring.profiles.active=test verify jacoco:report
+
+      - name: Publicar reporte de pruebas Maven
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Maven Unit Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+
+      - name: Mostrar logs de tests (si hay errores)
+        if: failure()
+        run: |
+          echo "=== Contenido de target/surefire-reports (primeros 200 líneas por archivo) ==="
+          if [ -d target/surefire-reports ]; then
+            for f in target/surefire-reports/*.txt; do
+              echo "--- $f ---";
+              sed -n '1,200p' "$f" || true;
+              echo "";
+            done
+          else
+            echo "No existe target/surefire-reports"
+          fi
+
+      - name: Subir reports de Surefire como artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+
+      - name: Subir cobertura JaCoCo a Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: sirha-backend-coverage
+
+      - name: Subir artifact del build (JAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: sirha-backend-jar
+          path: target/*.jar
+

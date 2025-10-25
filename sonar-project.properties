@@ -1,0 +1,1 @@
+To create a new Java Spring Boot project for the "Sistema de Reasignación de Horarios Académicos" (SIRHA) with a complete structure following the Model-View-Controller (MVC) pattern, please specify which file you would like to create or modify, and I will provide the contents for that specific file.
