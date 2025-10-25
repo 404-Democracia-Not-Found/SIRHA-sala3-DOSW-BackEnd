@@ -1,5 +1,6 @@
 # SIRHA Backend - Sistema Integral de Registro Horario Académico
 
+Recuperación version antigua del ReadMe
 ---
 
 ## Descripción del Proyecto
@@ -126,6 +127,7 @@ Sistema backend desarrollado en **Spring Boot** para la gestión integral de hor
 
 - `GET /swagger-ui.html` – Interfaz Swagger  
 - `GET /v3/api-docs` – Especificación OpenAPI  
+
 
 ---
 
