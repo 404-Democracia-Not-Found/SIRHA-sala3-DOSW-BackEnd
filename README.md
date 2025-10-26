@@ -1,16 +1,5 @@
 # SIRHA Backend - Sistema de Reasignación de Horarios Académicos
 
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
-![Java](https://img.shields.io/badge/Java-17-orange)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
-![Build](https://img.shields.io/badge/build-passing-success)
-
-**API REST profesional para la gestión integral de horarios académicos de la Escuela Colombiana de Ingeniería**
-
-[Documentación API](https://sistema-horarios-fyf5a2bkfggjc8hs.canadacentral-01.azurewebsites.net/swagger-ui.html) • [Repositorio Frontend](https://github.com/404-Democracia-Not-Found/SIRHA-sala3-DOSW-FrontEnd)
-
----
-
 ## Descripción del Proyecto
 
 Sistema backend desarrollado en **Spring Boot** para la gestión integral de horarios académicos, solicitudes de reasignación y detección automática de conflictos. El sistema implementa principios SOLID, seguridad JWT, documentación Swagger y una arquitectura escalable basada en roles.
@@ -295,10 +284,10 @@ Content-Type: application/json
 ### Ejecutar Tests
 
 ```bash
-# Todos los tests
+# Para ejecutar todos los test
 mvn test
 
-# Tests con cobertura
+# Para ejecutar los tests con cobertura
 mvn verify jacoco:report
 
 # Reporte en: target/site/jacoco/index.html
@@ -418,25 +407,10 @@ src/main/java/edu/dosw/sirha/
 
 ## Equipo
 
-**404-Democracia-Not-Found**
+**Dockerizados pero libres**
 
-Curso: Ciclos de Vida de Desarrollo de Software  
+Curso: Desarollo y Operaciones Software
 Escuela Colombiana de Ingeniería Julio Garavito  
 2025-2
 
 ---
-
-## Soporte
-
-¿Problemas o preguntas?
-
-- 🐛 [Reportar un bug](https://github.com/404-Democracia-Not-Found/SIRHA-sala3-DOSW-BackEnd/issues)
-- 📧 Contactar al equipo via GitHub
-
----
-
-<div align="center">
-
-**Desarrollado con ❤️ por 404-Democracia-Not-Found**
-
-</div>
