@@ -71,7 +71,7 @@ public class AuthController {
         @ApiResponse(responseCode = "403", description = "Cuenta inactiva")
     })
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
-        log.info("Request de login recibido para: {}", request.getEmail());
+        log.info("Request de login recibido para: {}", request.email());
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }

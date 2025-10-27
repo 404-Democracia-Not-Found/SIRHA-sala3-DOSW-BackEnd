@@ -1,6 +1,10 @@
 spring:
   application:
     name: sirha
+  # Cargar variables desde archivo .env
+  context:
+    initializer:
+      classes: edu.dosw.sirha.config.DotenvApplicationContextInitializer
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017}

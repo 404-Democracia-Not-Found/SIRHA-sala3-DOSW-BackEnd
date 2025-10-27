@@ -59,13 +59,13 @@ public class AuthService {
      * @throws BusinessException si las credenciales son inválidas o la cuenta está inactiva
      */
     public AuthResponse login(AuthRequest request) {
-        log.info("Intento de login para usuario: {}", request.getEmail());
+        log.info("Intento de login para usuario: {}", request.email());
 
         // Autenticar con Spring Security
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
+                request.email(),
+                request.password()
             )
         );
 
@@ -80,7 +80,8 @@ public class AuthService {
         }
 
         // Generar token JWT
-        String token = jwtTokenService.generateToken(user);
+        UserPrincipal principal = new UserPrincipal(user);
+        String token = jwtTokenService.generateToken(principal);
         Instant expiresAt = jwtTokenService.getExpirationFromToken(token);
 
         // Actualizar último acceso
@@ -89,17 +90,17 @@ public class AuthService {
 
         log.info("Login exitoso para usuario: {} con rol: {}", user.getEmail(), user.getRol());
 
-        // Construir respuesta
-        return AuthResponse.builder()
-                .token(token)
-                .expiresAt(expiresAt)
-                .userInfo(AuthResponse.UserInfo.builder()
-                        .id(user.getId())
-                        .nombre(user.getNombre())
-                        .email(user.getEmail())
-                        .rol(user.getRol().name())
-                        .build())
-                .build();
+        // Construir respuesta (AuthResponse es un record)
+        return new AuthResponse(
+                token,
+                expiresAt,
+                new AuthResponse.UserInfo(
+                        user.getId(),
+                        user.getNombre(),
+                        user.getEmail(),
+                        user.getRol().name()
+                )
+        );
     }
 
     /**
