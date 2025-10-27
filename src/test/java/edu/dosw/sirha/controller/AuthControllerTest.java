@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.dosw.sirha.dto.auth.AuthRequest;
 import edu.dosw.sirha.dto.auth.AuthResponse;
 import edu.dosw.sirha.exception.BusinessException;
+import edu.dosw.sirha.security.JwtTokenService;
 import edu.dosw.sirha.service.AuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,9 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private JwtTokenService jwtTokenService;
 
     @Test
     void loginShouldReturnToken() throws Exception {
