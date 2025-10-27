@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.dosw.sirha.dto.auth.AuthRequest;
 import edu.dosw.sirha.dto.auth.AuthResponse;
+import edu.dosw.sirha.dto.auth.RefreshRequest;
+import edu.dosw.sirha.dto.auth.RefreshResponse;
 import edu.dosw.sirha.exception.BusinessException;
 import edu.dosw.sirha.repository.UserRepository;
 import edu.dosw.sirha.security.JwtProperties;
@@ -239,9 +241,12 @@ public class AuthController {
         if (!userPrincipal.getUser().isActivo()) {
             throw new BusinessException("Tu cuenta está inactiva");
         }
-        Instant issuedAt = Instant.now(clock);
-        Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
-        String token = jwtTokenService.generateToken(userPrincipal);
+    Instant issuedAt = Instant.now(clock);
+    Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
+    String token = jwtTokenService.generateToken(userPrincipal);
+    // generate refresh token with longer expiration
+    String refreshToken = jwtTokenService.generateToken(userPrincipal, jwtProperties.getRefreshExpirationMinutes());
+    Instant refreshExpiresAt = issuedAt.plus(jwtProperties.getRefreshExpirationMinutes(), ChronoUnit.MINUTES);
         userPrincipal.getUser().setUltimoAcceso(issuedAt);
         userRepository.save(userPrincipal.getUser());
 
@@ -252,6 +257,28 @@ public class AuthController {
                 userPrincipal.getUser().getRol() != null ? userPrincipal.getUser().getRol().name() : null
         );
 
-        return ResponseEntity.ok(new AuthResponse(token, expiresAt, userInfo));
+        return ResponseEntity.ok(new AuthResponse(token, expiresAt, refreshToken, refreshExpiresAt, userInfo));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<RefreshResponse> refresh(@Valid @RequestBody RefreshRequest request) {
+        String refreshToken = request.refreshToken();
+        try {
+            String username = jwtTokenService.extractUsername(refreshToken);
+            // load user
+            var user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new BusinessException("Usuario no encontrado"));
+            // validate token against user
+            if (!jwtTokenService.isTokenValid(refreshToken, new edu.dosw.sirha.security.UserPrincipal(user))) {
+                throw new BusinessException("Refresh token inválido");
+            }
+            // generate new access token
+            String newToken = jwtTokenService.generateToken(new edu.dosw.sirha.security.UserPrincipal(user));
+            Instant issuedAt = Instant.now(clock);
+            Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
+            return ResponseEntity.ok(new RefreshResponse(newToken, expiresAt));
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException ex) {
+            throw new BusinessException("Refresh token inválido");
+        }
     }
 }

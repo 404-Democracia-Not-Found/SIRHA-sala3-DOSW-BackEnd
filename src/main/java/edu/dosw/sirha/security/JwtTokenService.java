@@ -98,6 +98,21 @@ public class JwtTokenService {
 	}
 
 	/**
+	 * Genera un token JWT con expiración personalizada (en minutos).
+	 */
+	public String generateToken(UserDetails userDetails, int expirationMinutes) {
+		Instant now = Instant.now(clock);
+		Instant expiration = now.plus(expirationMinutes, ChronoUnit.MINUTES);
+		return Jwts.builder()
+				.setSubject(userDetails.getUsername())
+				.setIssuer(properties.getIssuer())
+				.setIssuedAt(Date.from(now))
+				.setExpiration(Date.from(expiration))
+				.signWith(getSigningKey(), SignatureAlgorithm.HS256)
+				.compact();
+	}
+
+	/**
 	 * Valida un token JWT contra un usuario.
 	 * 
 	 * <p>Verifica que:</p>
