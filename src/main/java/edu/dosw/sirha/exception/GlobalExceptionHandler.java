@@ -214,7 +214,7 @@ public class GlobalExceptionHandler {
                 .timestamp(Instant.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
-                .errorCode("SIRHA-400-000")
+                .errorCode("SIRHA-400-002")
                 .message(ex.getMessage())
                 .path(extractPath(request))
                 .build();
