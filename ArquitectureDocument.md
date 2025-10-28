@@ -375,56 +375,56 @@ Optional<User> findByEmail(String email);
 **Decisión:** Separar frontend y backend
 
 **Razones:**
-- ✅ Separación de responsabilidades (SRP)
-- ✅ Escalabilidad independiente de cada capa
-- ✅ Permite múltiples clientes (web actual, móvil futuro)
-- ✅ Equipos pueden trabajar en paralelo
-- ✅ Testing más sencillo con mocks
+- Separación de responsabilidades (SRP)
+- Escalabilidad independiente de cada capa
+- Permite múltiples clientes (web actual, móvil futuro)
+- Equipos pueden trabajar en paralelo
+- Testing más sencillo con mocks
 
 ### 4.2 ¿Por qué MongoDB (NoSQL)?
 **Decisión:** Base de datos documental
 
 **Razones:**
-- ✅ Flexibilidad en el esquema de datos (horarios complejos)
-- ✅ Mejor rendimiento para lecturas frecuentes
-- ✅ Estructura de solicitudes con historial se adapta bien a documentos
-- ✅ MongoDB Atlas ofrece gestión automática (backups, replicación)
-- ✅ Escalamiento horizontal con sharding
+- Flexibilidad en el esquema de datos (horarios complejos)
+- Mejor rendimiento para lecturas frecuentes
+- Estructura de solicitudes con historial se adapta bien a documentos
+- MongoDB Atlas ofrece gestión automática (backups, replicación)
+- Escalamiento horizontal con sharding
 
 **Trade-offs aceptados:**
-- ⚠️ No tiene transacciones ACID complejas (mitigado con validaciones en servicio)
-- ⚠️ Relaciones deben manejarse manualmente (usamos referencias por ID)
+- No tiene transacciones ACID complejas (mitigado con validaciones en servicio)
+- Relaciones deben manejarse manualmente (usamos referencias por ID)
 
 ### 4.3 ¿Por qué Spring Boot?
 **Decisión:** Framework para backend
 
 **Razones:**
-- ✅ Inyección de dependencias integrada (@Autowired, @RequiredArgsConstructor)
-- ✅ Spring Data MongoDB facilita acceso a datos
-- ✅ Spring Security maduro y robusto para JWT
-- ✅ Configuración por convención (menos boilerplate)
-- ✅ Ecosistema de testing (JUnit, Mockito, TestContainers)
-- ✅ Actuator para health checks y métricas
+- Inyección de dependencias integrada (@Autowired, @RequiredArgsConstructor)
+- Spring Data MongoDB facilita acceso a datos
+- Spring Security maduro y robusto para JWT
+- Configuración por convención (menos boilerplate)
+- Ecosistema de testing (JUnit, Mockito, TestContainers)
+- Actuator para health checks y métricas
 
 ### 4.4 ¿Por qué React?
 **Decisión:** Librería para frontend
 
 **Razones:**
-- ✅ Componentes reutilizables (Dashboard, Forms, Tables)
-- ✅ Virtual DOM para rendimiento
-- ✅ Hooks para manejo de estado
-- ✅ Gran ecosistema (React Router, Axios, Lucide React)
-- ✅ Curva de aprendizaje manejable
+- Componentes reutilizables (Dashboard, Forms, Tables)
+- Virtual DOM para rendimiento
+- Hooks para manejo de estado
+- Gran ecosistema (React Router, Axios, Lucide React)
+- Curva de aprendizaje manejable
 
 ### 4.5 ¿Por qué JWT para autenticación?
 **Decisión:** JSON Web Tokens sobre sesiones tradicionales
 
 **Razones:**
-- ✅ Stateless (no requiere almacenar sesiones en servidor)
-- ✅ Escalable horizontalmente
-- ✅ Funciona bien con arquitectura Cliente-Servidor
-- ✅ Puede incluir claims (roles, permisos)
-- ✅ Estándar de industria (RFC 7519)
+- Stateless (no requiere almacenar sesiones en servidor)
+- Escalable horizontalmente
+- Funciona bien con arquitectura Cliente-Servidor
+- Puede incluir claims (roles, permisos)
+- Estándar de industria (RFC 7519)
 
 **Implementación:**
 - Algoritmo: HS256 (HMAC con SHA-256)
@@ -436,12 +436,12 @@ Optional<User> findByEmail(String email);
 **Decisión:** Plataforma de hosting
 
 **Razones:**
-- ✅ PaaS (Platform as a Service) - menos gestión de infraestructura
-- ✅ CI/CD integrado con GitHub Actions
-- ✅ Escalamiento automático basado en métricas
-- ✅ Soporte nativo para Spring Boot JAR
-- ✅ SSL/TLS automático
-- ✅ Créditos educativos disponibles
+- PaaS (Platform as a Service) - menos gestión de infraestructura
+- CI/CD integrado con GitHub Actions
+- Escalamiento automático basado en métricas
+- Soporte nativo para Spring Boot JAR
+- SSL/TLS automático
+- Créditos educativos disponibles
 
 **URL de producción:**
 `https://sistema-horarios-fyf5a2bkfggjc8hs.canadacentral-01.azurewebsites.net`
@@ -450,10 +450,10 @@ Optional<User> findByEmail(String email);
 **Decisión:** Patrón Interface-Implementation para servicios
 
 **Razones:**
-- ✅ Facilita testing con mocks/stubs
-- ✅ Permite múltiples implementaciones futuras
-- ✅ Cumple Dependency Inversion Principle (SOLID)
-- ✅ Documentación clara de contratos en interfaces
+- Facilita testing con mocks/stubs
+- Permite múltiples implementaciones futuras
+- Cumple Dependency Inversion Principle (SOLID)
+- Documentación clara de contratos en interfaces
 
 **Ejemplo:**
 ```java
@@ -691,11 +691,11 @@ public class SolicitudServiceImpl implements SolicitudService {
 ### 7.1 Autenticación y Autorización
 
 **Implementado:**
-- ✅ Spring Security con JWT
-- ✅ Autenticación basada en tokens
-- ✅ Passwords hasheados con BCrypt (strength: 10)
-- ✅ Roles: `ESTUDIANTE`, `PROFESOR`, `COORDINADOR`, `ADMIN`
-- ✅ `@PreAuthorize` para control de acceso por rol (método por método)
+- Spring Security con JWT
+- Autenticación basada en tokens
+- Passwords hasheados con BCrypt (strength: 10)
+- Roles: `ESTUDIANTE`, `PROFESOR`, `COORDINADOR`, `ADMIN`
+- `@PreAuthorize` para control de acceso por rol (método por método)
 
 **Configuración JWT:**
 ```yaml
@@ -716,9 +716,9 @@ sirha:
 ### 7.2 Comunicación Segura
 
 **SSL/HTTPS:**
-- ✅ Azure App Service proporciona certificado SSL automático
-- ✅ URL con HTTPS: `https://sistema-horarios-fyf5a2bkfggjc8hs.canadacentral-01.azurewebsites.net`
-- ✅ Redirect HTTP → HTTPS automático en Azure
+- Azure App Service proporciona certificado SSL automático
+- URL con HTTPS: `https://sistema-horarios-fyf5a2bkfggjc8hs.canadacentral-01.azurewebsites.net`
+- Redirect HTTP → HTTPS automático en Azure
 
 **CORS:**
 - Configurado en `WebConfig.java`
@@ -728,10 +728,10 @@ sirha:
 ### 7.3 Protección de Datos Sensibles
 
 **Variables de entorno:**
-- ✅ Archivo `.env` para desarrollo local (excluido de Git)
-- ✅ `DotenvApplicationContextInitializer` carga variables al inicio
-- ✅ GitHub Secrets para CI/CD
-- ✅ Azure App Service Configuration para producción
+- Archivo `.env` para desarrollo local (excluido de Git)
+- `DotenvApplicationContextInitializer` carga variables al inicio
+- GitHub Secrets para CI/CD
+- Azure App Service Configuration para producción
 
 **Secrets gestionados:**
 - `MONGODB_URI`: Connection string de MongoDB Atlas
@@ -769,14 +769,14 @@ sirha:
 ### 8.2 Optimizaciones Implementadas
 
 **Backend:**
-- ✅ Índices en MongoDB para consultas frecuentes:
+- Índices en MongoDB para consultas frecuentes:
   - `users.email` (unique)
   - `solicitudes.estudianteId`
   - `solicitudes.estado`
   - `materias.codigo` (unique)
-- ✅ Queries optimizadas en repositories
-- ✅ Paginación en endpoints que retornan listas (planificado)
-- ✅ Projection de campos en queries MongoDB (solo campos necesarios)
+- Queries optimizadas en repositories
+- Paginación en endpoints que retornan listas (planificado)
+- Projection de campos en queries MongoDB (solo campos necesarios)
 
 ---
 
@@ -785,17 +785,17 @@ sirha:
 ### 9.1 Estrategia de Testing
 
 **Backend:**
-- ✅ **Pruebas Unitarias:** JUnit 5 + Mockito
+- **Pruebas Unitarias:** JUnit 5 + Mockito
   - Tests para servicios con mocks de repositories
   - Tests de mappers
   - Tests de utilidades
-- ✅ **Cobertura de Código:** JaCoCo
+- **Cobertura de Código:** JaCoCo
   - Reporte en `target/site/jacoco/index.html`
   - Umbral mínimo configurado en `pom.xml`
-- ✅ **CI/CD con GitHub Actions:**
+- **CI/CD con GitHub Actions:**
   - Pipeline CI ejecuta tests en cada push/PR a `develop`
   - Fallos bloquean merge
-- ✅ **Reportes a Codecov:** Análisis de cobertura automático
+- **Reportes a Codecov:** Análisis de cobertura automático
 
 ### 9.2 CI/CD Pipeline
 
@@ -834,9 +834,9 @@ Pasos:
 ### 9.3 Análisis de Calidad
 
 **Herramientas utilizadas:**
-- ✅ JaCoCo: Cobertura de código
-- ✅ Codecov: Visualización de cobertura en PRs
-- ✅ GitHub Actions Test Reporter: Reportes visuales de tests
+- JaCoCo: Cobertura de código
+- Codecov: Visualización de cobertura en PRs
+- GitHub Actions Test Reporter: Reportes visuales de tests
 
 ---
 
@@ -1272,11 +1272,11 @@ SIRHA implementa una arquitectura moderna cliente-servidor que separa claramente
 ### Cumplimiento de objetivos:
 
 La arquitectura elegida cumple exitosamente con los requisitos del proyecto SIRHA:
-- ✅ **Simplicidad:** Arquitectura clara y comprensible
-- ✅ **Escalabilidad:** Preparada para crecer según necesidades
-- ✅ **Seguridad:** Autenticación, autorización y HTTPS implementados
-- ✅ **Calidad:** Tests automatizados y CI/CD funcional
-- ✅ **Documentación:** Swagger para API, Javadoc en código, este documento de arquitectura
+- **Simplicidad:** Arquitectura clara y comprensible
+- **Escalabilidad:** Preparada para crecer según necesidades
+- **Seguridad:** Autenticación, autorización y HTTPS implementados
+- **Calidad:** Tests automatizados y CI/CD funcional
+- **Documentación:** Swagger para API, Javadoc en código, este documento de arquitectura
 
 El sistema está listo para soportar las operaciones de reasignación de horarios de la Escuela Colombiana de Ingeniería, con una base sólida para evolucionar y adaptarse a futuras necesidades.
 
