@@ -1,4 +1,4 @@
-package edu.dosw.sirha.dto.auth;
+package edu.dosw.sirha.dto.refresh;
 
 import java.time.Instant;
 
