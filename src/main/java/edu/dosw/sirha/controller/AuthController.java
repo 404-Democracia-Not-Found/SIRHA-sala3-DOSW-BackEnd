@@ -241,12 +241,12 @@ public class AuthController {
         if (!userPrincipal.getUser().isActivo()) {
             throw new BusinessException("Tu cuenta está inactiva");
         }
-    Instant issuedAt = Instant.now(clock);
-    Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
-    String token = jwtTokenService.generateToken(userPrincipal);
-    // generate refresh token with longer expiration
-    String refreshToken = jwtTokenService.generateToken(userPrincipal, jwtProperties.getRefreshExpirationMinutes());
-    Instant refreshExpiresAt = issuedAt.plus(jwtProperties.getRefreshExpirationMinutes(), ChronoUnit.MINUTES);
+        Instant issuedAt = Instant.now(clock);
+        Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
+        String token = jwtTokenService.generateToken(userPrincipal);
+        // generate refresh token with longer expiration
+        String refreshToken = jwtTokenService.generateToken(userPrincipal, jwtProperties.getRefreshExpirationMinutes());
+        Instant refreshExpiresAt = issuedAt.plus(jwtProperties.getRefreshExpirationMinutes(), ChronoUnit.MINUTES);
         userPrincipal.getUser().setUltimoAcceso(issuedAt);
         userRepository.save(userPrincipal.getUser());
 
