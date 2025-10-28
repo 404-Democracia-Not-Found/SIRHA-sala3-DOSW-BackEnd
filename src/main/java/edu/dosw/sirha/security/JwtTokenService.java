@@ -142,6 +142,16 @@ public class JwtTokenService {
 	}
 
 	/**
+	 * Obtiene la fecha de expiración de un token JWT.
+	 * 
+	 * @param token Token JWT
+	 * @return Instant con la fecha de expiración del token
+	 */
+	public Instant getExpirationFromToken(String token) {
+		return extractClaim(token, claims -> claims.getExpiration().toInstant());
+	}
+
+	/**
 	 * Parsea y valida un token JWT extrayendo sus claims.
 	 * 
 	 * @param token Token JWT a parsear

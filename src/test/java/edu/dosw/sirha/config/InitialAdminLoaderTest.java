@@ -6,62 +6,40 @@ import edu.dosw.sirha.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.Clock;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
- * Suite de pruebas unitarias para {@link InitialAdminLoader}.
+ * Suite de pruebas para {@link InitialAdminLoader}.
  * 
- * <p>Esta clase verifica el correcto funcionamiento del loader que crea automáticamente
- * el usuario administrador por defecto al iniciar la aplicación, incluyendo la lógica
- * de detección de existencia y encriptación de contraseña.</p>
- * 
- * <p><strong>Configuración de pruebas:</strong></p>
- * <ul>
- *   <li>Usa {@code @ExtendWith(MockitoExtension.class)} para inyección de mocks</li>
- *   <li>Mockea {@link UserRepository} para verificar operaciones de persistencia</li>
- *   <li>Mockea {@link PasswordEncoder} para validar encriptación de contraseña</li>
- *   <li>Clock fijo para timestamps determinísticos</li>
- * </ul>
+ * <p>Verifica el comportamiento de creación del usuario ADMIN inicial
+ * desde variables de entorno.</p>
  * 
  * <p><strong>Escenarios probados:</strong></p>
  * <ul>
- *   <li><strong>Creación inicial:</strong> cuando no existe admin, se crea con datos por defecto</li>
- *   <li><strong>Idempotencia:</strong> si ya existe admin, no se crea duplicado</li>
- *   <li><strong>Encriptación:</strong> contraseña se encripta antes de guardar</li>
- *   <li><strong>Valores por defecto:</strong> email, nombre, rol ADMIN, estado activo</li>
- *   <li><strong>Timestamps:</strong> createdAt se establece correctamente</li>
+ *   <li>Creación exitosa cuando no existe ADMIN y variables están configuradas</li>
+ *   <li>No creación cuando ya existe un usuario ADMIN</li>
+ *   <li>No creación cuando faltan variables de entorno</li>
+ *   <li>Hasheo correcto de contraseña</li>
+ *   <li>Configuración correcta de timestamps</li>
  * </ul>
- * 
- * <p><strong>Datos de administrador por defecto:</strong></p>
- * <ul>
- *   <li>Email: admin@sirha.local</li>
- *   <li>Contraseña: Admin123! (encriptada con BCrypt)</li>
- *   <li>Nombre: Administrador del Sistema</li>
- *   <li>Rol: ADMIN</li>
- *   <li>Estado: activo (true)</li>
- * </ul>
- * 
- * @see InitialAdminLoader
- * @see org.springframework.boot.CommandLineRunner
  */
 @ExtendWith(MockitoExtension.class)
 class InitialAdminLoaderTest {
 
-    private static final String DEFAULT_EMAIL = "admin@sirha.local";
-    private static final String RAW_PASSWORD = "Admin123!";
+    private static final Instant FIXED_NOW = Instant.parse("2025-01-15T12:00:00Z");
+    private static final String TEST_ADMIN_EMAIL = "admin@test.local";
+    private static final String TEST_ADMIN_PASSWORD = "TestPassword123!";
+    private static final String TEST_ADMIN_NAME = "Test Admin";
 
     @Mock
     private UserRepository userRepository;
@@ -70,44 +48,111 @@ class InitialAdminLoaderTest {
     private PasswordEncoder passwordEncoder;
 
     private Clock clock;
-
-    private InitialAdminLoader loader;
-
-    private Instant now;
+    private InitialAdminLoader initialAdminLoader;
 
     @BeforeEach
     void setUp() {
-        now = Instant.parse("2025-10-01T15:00:00Z");
-        clock = Clock.fixed(now, ZoneOffset.UTC);
-        loader = new InitialAdminLoader(userRepository, passwordEncoder, clock);
+        clock = Clock.fixed(FIXED_NOW, ZoneOffset.UTC);
+        initialAdminLoader = new InitialAdminLoader(userRepository, passwordEncoder, clock);
     }
 
     @Test
-    void shouldCreateDefaultAdminWhenDoesNotExist() {
-        when(userRepository.existsByEmail(DEFAULT_EMAIL)).thenReturn(false);
-        when(passwordEncoder.encode(RAW_PASSWORD)).thenReturn("hashed-password");
+    void runShouldCreateAdminUserWhenNoneExistsAndEnvVarsAreSet() {
+        // Arrange
+        ReflectionTestUtils.setField(initialAdminLoader, "adminEmail", TEST_ADMIN_EMAIL);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminPassword", TEST_ADMIN_PASSWORD);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminName", TEST_ADMIN_NAME);
 
-        loader.run();
+        when(userRepository.existsByRol(Rol.ADMIN)).thenReturn(false);
+        when(passwordEncoder.encode(TEST_ADMIN_PASSWORD)).thenReturn("encoded-password");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(captor.capture());
-        User savedUser = captor.getValue();
+        // Act
+        initialAdminLoader.run();
 
-        assertThat(savedUser.getNombre()).isEqualTo("Administrador");
-        assertThat(savedUser.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(savedUser.getPasswordHash()).isEqualTo("hashed-password");
-        assertThat(savedUser.getRol()).isEqualTo(Rol.ADMIN);
-        assertThat(savedUser.isActivo()).isTrue();
-        assertThat(savedUser.getCreadoEn()).isEqualTo(now);
-        assertThat(savedUser.getActualizadoEn()).isEqualTo(now);
+        // Assert
+        verify(userRepository).existsByRol(Rol.ADMIN);
+        verify(passwordEncoder).encode(TEST_ADMIN_PASSWORD);
+        verify(userRepository).save(argThat(user ->
+                user.getEmail().equals(TEST_ADMIN_EMAIL.toLowerCase()) &&
+                user.getNombre().equals(TEST_ADMIN_NAME) &&
+                user.getRol().equals(Rol.ADMIN) &&
+                user.isActivo() &&
+                user.getCreadoEn().equals(FIXED_NOW) &&
+                user.getActualizadoEn().equals(FIXED_NOW) &&
+                user.getPasswordHash().equals("encoded-password")
+        ));
     }
 
     @Test
-    void shouldNotCreateAdminIfAlreadyExists() {
-        when(userRepository.existsByEmail(DEFAULT_EMAIL)).thenReturn(true);
+    void runShouldNotCreateAdminWhenOneAlreadyExists() {
+        // Arrange
+        ReflectionTestUtils.setField(initialAdminLoader, "adminEmail", TEST_ADMIN_EMAIL);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminPassword", TEST_ADMIN_PASSWORD);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminName", TEST_ADMIN_NAME);
 
-        loader.run();
+        when(userRepository.existsByRol(Rol.ADMIN)).thenReturn(true);
 
+        // Act
+        initialAdminLoader.run();
+
+        // Assert
+        verify(userRepository).existsByRol(Rol.ADMIN);
         verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    void runShouldNotCreateAdminWhenEmailIsNull() {
+        // Arrange
+        ReflectionTestUtils.setField(initialAdminLoader, "adminEmail", null);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminPassword", TEST_ADMIN_PASSWORD);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminName", TEST_ADMIN_NAME);
+
+        when(userRepository.existsByRol(Rol.ADMIN)).thenReturn(false);
+
+        // Act
+        initialAdminLoader.run();
+
+        // Assert
+        verify(userRepository).existsByRol(Rol.ADMIN);
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    void runShouldNotCreateAdminWhenPasswordIsBlank() {
+        // Arrange
+        ReflectionTestUtils.setField(initialAdminLoader, "adminEmail", TEST_ADMIN_EMAIL);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminPassword", "   ");
+        ReflectionTestUtils.setField(initialAdminLoader, "adminName", TEST_ADMIN_NAME);
+
+        when(userRepository.existsByRol(Rol.ADMIN)).thenReturn(false);
+
+        // Act
+        initialAdminLoader.run();
+
+        // Assert
+        verify(userRepository).existsByRol(Rol.ADMIN);
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    void runShouldNotCreateAdminWhenNameIsNull() {
+        // Arrange
+        ReflectionTestUtils.setField(initialAdminLoader, "adminEmail", TEST_ADMIN_EMAIL);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminPassword", TEST_ADMIN_PASSWORD);
+        ReflectionTestUtils.setField(initialAdminLoader, "adminName", null);
+
+        when(userRepository.existsByRol(Rol.ADMIN)).thenReturn(false);
+
+        // Act
+        initialAdminLoader.run();
+
+        // Assert
+        verify(userRepository).existsByRol(Rol.ADMIN);
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
     }
 }
