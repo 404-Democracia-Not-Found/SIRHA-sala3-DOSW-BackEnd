@@ -1,0 +1,51 @@
+# ============================================
+# .dockerignore - Archivos excluidos del build
+# ============================================
+
+# Directorios de build y compilación
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+*.asta
+
+# Logs
+logs/
+*.log
+
+# Test reports
+surefire-reports/
+jacoco.exec
+
+# Environment files (sensitive data)
+.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
