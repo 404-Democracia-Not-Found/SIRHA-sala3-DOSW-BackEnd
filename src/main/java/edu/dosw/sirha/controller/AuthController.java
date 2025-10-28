@@ -269,11 +269,11 @@ public class AuthController {
             var user = userRepository.findByEmail(username)
                     .orElseThrow(() -> new BusinessException("Usuario no encontrado"));
             // validate token against user
-            if (!jwtTokenService.isTokenValid(refreshToken, new edu.dosw.sirha.security.UserPrincipal(user))) {
+            if (!jwtTokenService.isTokenValid(refreshToken, new UserPrincipal(user))) {
                 throw new BusinessException("Refresh token inválido");
             }
             // generate new access token
-            String newToken = jwtTokenService.generateToken(new edu.dosw.sirha.security.UserPrincipal(user));
+            String newToken = jwtTokenService.generateToken(new UserPrincipal(user));
             Instant issuedAt = Instant.now(clock);
             Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
             return ResponseEntity.ok(new RefreshResponse(newToken, expiresAt));
