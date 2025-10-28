@@ -16,298 +16,295 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import edu.dosw.sirha.exception.BusinessException;
-import edu.dosw.sirha.exception.ConflictException;
-import edu.dosw.sirha.exception.ResourceNotFoundException;
-import edu.dosw.sirha.exception.ValidationException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 /**
- * Manejador global de excepciones para la aplicación SIRHA.
+ * Manejador global de excepciones para el sistema SIRHA.
  * 
- * <p>Proporciona respuestas de error consistentes y bien estructuradas para todos
- * los endpoints REST del sistema.</p>
+ * <p>Esta clase centraliza el manejo de todas las excepciones lanzadas en la aplicación,
+ * proporcionando respuestas HTTP consistentes y estandarizadas con códigos de error específicos
+ * del dominio SIRHA. Utiliza la anotación {@code @ControllerAdvice} para interceptar excepciones
+ * en todos los controladores REST y transformarlas en respuestas JSON estructuradas.</p>
  * 
- * <h2>Códigos de Error SIRHA:</h2>
+ * <p><strong>Tipos de excepciones manejadas:</strong></p>
  * <ul>
- *   <li><b>SIRHA-400-001:</b> Email duplicado (409)</li>
- *   <li><b>SIRHA-400-002:</b> Datos de entrada inválidos (400)</li>
- *   <li><b>SIRHA-400-003:</b> Dominio de email inválido (422)</li>
- *   <li><b>SIRHA-401-001:</b> Credenciales inválidas (401)</li>
- *   <li><b>SIRHA-404-001:</b> Recurso no encontrado (404)</li>
- *   <li><b>SIRHA-500-001:</b> Error interno del servidor (500)</li>
+ *   <li><strong>ResourceNotFoundException:</strong> recursos no encontrados (HTTP 404)</li>
+ *   <li><strong>BusinessException:</strong> violaciones de reglas de negocio (HTTP 400)</li>
+ *   <li><strong>MethodArgumentNotValidException:</strong> errores de validación Jakarta (HTTP 400)</li>
+ *   <li><strong>BadCredentialsException:</strong> credenciales inválidas (HTTP 401)</li>
+ *   <li><strong>AccessDeniedException:</strong> acceso denegado por permisos (HTTP 403)</li>
+ *   <li><strong>Exception:</strong> errores internos no controlados (HTTP 500)</li>
  * </ul>
  * 
- * @author Equipo DOSW - SIRHA
- * @version 2.0
- * @since 2025-10-26
+ * <p><strong>Estructura de respuesta estándar:</strong></p>
+ * <pre>
+ * {
+ *   "timestamp": "2025-01-15T10:30:00Z",
+ *   "status": 400,
+ *   "error": "Bad Request",
+ *   "errorCode": "SIRHA-400-003",
+ *   "message": "Conflicto de horario detectado",
+ *   "path": "/api/solicitudes",
+ *   "validationErrors": {...}  // solo para errores de validación
+ * }
+ * </pre>
+ * 
+ * <p><strong>Códigos de error SIRHA:</strong></p>
+ * <ul>
+ *   <li>SIRHA-404-001: Recurso no encontrado</li>
+ *   <li>SIRHA-400-001: Regla de negocio genérica violada</li>
+ *   <li>SIRHA-400-002: Errores de validación de datos</li>
+ *   <li>SIRHA-400-003: Conflicto de horarios</li>
+ *   <li>SIRHA-400-004: Cupo de grupo lleno</li>
+ *   <li>SIRHA-400-005: Periodo académico cerrado</li>
+ *   <li>SIRHA-401-001: Autenticación fallida</li>
+ *   <li>SIRHA-403-001: Permisos insuficientes</li>
+ *   <li>SIRHA-500-001: Error interno del servidor</li>
+ * </ul>
+ * 
+ * @see org.springframework.web.bind.annotation.ControllerAdvice
+ * @see org.springframework.web.bind.annotation.ExceptionHandler
+ * 
+ * @author Sistema SIRHA
+ * @version 1.0
  */
-@Slf4j
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Maneja errores de validación de Bean Validation (@Valid).
-     * Retorna HTTP 400 Bad Request con detalles de los campos inválidos.
-     * 
-     * @param ex Excepción de validación
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con validationErrors mapeados por campo
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex,
-            WebRequest request) {
-        
-        log.warn("Error de validación en request a: {}", request.getDescription(false));
-        
-        Map<String, String> validationErrors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            validationErrors.put(fieldName, errorMessage);
-        });
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad Request")
-                .errorCode("SIRHA-400-002")
-                .message("Datos de entrada inválidos")
-                .path(extractPath(request))
-                .validationErrors(validationErrors)
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    // Códigos de error específicos para SIRHA
+    
+    /** Código de error para recursos no encontrados en la base de datos. */
+    public static final String ERROR_RESOURCE_NOT_FOUND = "SIRHA-404-001";
+    
+    /** Código de error genérico para violaciones de reglas de negocio. */
+    public static final String ERROR_BUSINESS_RULE = "SIRHA-400-001";
+    
+    /** Código de error para validaciones de datos de entrada fallidas. */
+    public static final String ERROR_VALIDATION = "SIRHA-400-002";
+    
+    /** Código de error específico para conflictos de horario entre materias. */
+    public static final String ERROR_HORARIO_CONFLICT = "SIRHA-400-003";
+    
+    /** Código de error para intentos de inscripción en grupos sin cupos. */
+    public static final String ERROR_CUPO_LLENO = "SIRHA-400-004";
+    
+    /** Código de error para operaciones fuera de ventanas de tiempo permitidas. */
+    public static final String ERROR_PERIODO_CERRADO = "SIRHA-400-005";
+    
+    /** Código de error para credenciales de autenticación inválidas. */
+    public static final String ERROR_UNAUTHORIZED = "SIRHA-401-001";
+    
+    /** Código de error para acceso denegado por falta de permisos. */
+    public static final String ERROR_FORBIDDEN = "SIRHA-403-001";
+    
+    /** Código de error para excepciones no controladas del servidor. */
+    public static final String ERROR_INTERNAL = "SIRHA-500-001";
 
     /**
-     * Maneja excepciones de validación de negocio (ValidationException).
-     * Retorna HTTP 422 Unprocessable Entity.
+     * Maneja excepciones de recursos no encontrados.
      * 
-     * @param ex Excepción de validación
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con mensaje descriptivo
-     */
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
-            ValidationException ex,
-            WebRequest request) {
-        
-        log.warn("Error de validación de negocio: {}", ex.getMessage());
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
-                .error("Unprocessable Entity")
-                .errorCode("SIRHA-400-003")
-                .message(ex.getMessage())
-                .path(extractPath(request))
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorResponse);
-    }
-
-    /**
-     * Maneja excepciones de conflicto (ConflictException).
-     * Retorna HTTP 409 Conflict.
+     * <p>Este método captura todas las instancias de {@link ResourceNotFoundException} lanzadas
+     * en la aplicación y las transforma en respuestas HTTP 404 estandarizadas con el código de
+     * error SIRHA-404-001.</p>
      * 
-     * @param ex Excepción de conflicto
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con mensaje descriptivo
-     */
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflictException(
-            ConflictException ex,
-            WebRequest request) {
-        
-        log.warn("Error de conflicto: {}", ex.getMessage());
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error("Conflict")
-                .errorCode("SIRHA-400-001")
-                .message(ex.getMessage())
-                .path(extractPath(request))
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
-    /**
-     * Maneja credenciales inválidas en el login.
-     * Retorna HTTP 401 Unauthorized.
-     * 
-     * @param ex Excepción de credenciales inválidas
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con mensaje genérico de seguridad
-     */
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentials(
-            BadCredentialsException ex,
-            WebRequest request) {
-        
-        log.warn("Intento de login fallido desde: {}", request.getDescription(false));
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .error("Unauthorized")
-                .errorCode("SIRHA-401-001")
-                .message("Email o contraseña incorrectos")
-                .path(extractPath(request))
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-    }
-
-    /**
-     * Maneja recursos no encontrados (ResourceNotFoundException).
-     * Retorna HTTP 404 Not Found.
-     * 
-     * @param ex Excepción de recurso no encontrado
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con mensaje descriptivo
+     * @param ex la excepción de recurso no encontrado capturada
+     * @return respuesta HTTP 404 con detalles del error en formato JSON
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFound(
-            ResourceNotFoundException ex,
-            WebRequest request) {
-        
-        log.warn("Recurso no encontrado: {}", ex.getMessage());
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.NOT_FOUND.value())
-                .error("Not Found")
-                .errorCode("SIRHA-404-001")
-                .message(ex.getMessage())
-                .path(extractPath(request))
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, ERROR_RESOURCE_NOT_FOUND, ex.getMessage());
     }
 
     /**
-     * Maneja excepciones de negocio genéricas (BusinessException).
-     * Retorna HTTP 400 Bad Request.
+     * Maneja excepciones de reglas de negocio.
      * 
-     * @param ex Excepción de negocio
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con mensaje descriptivo
+     * <p>Este método captura {@link BusinessException} y analiza el mensaje de error para
+     * determinar un código de error más específico (conflicto de horario, cupo lleno, periodo
+     * cerrado) basado en palabras clave. Retorna una respuesta HTTP 400 con el código apropiado.</p>
+     * 
+     * @param ex la excepción de negocio capturada
+     * @return respuesta HTTP 400 con código de error específico y detalles
+     * @see #determineBusinessErrorCode(String)
      */
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
-            BusinessException ex,
-            WebRequest request) {
-        
-        log.warn("Error de negocio: {}", ex.getMessage());
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad Request")
-                .errorCode("SIRHA-400-002")
-                .message(ex.getMessage())
-                .path(extractPath(request))
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    public ResponseEntity<Map<String, Object>> handleBusiness(BusinessException ex) {
+        String errorCode = determineBusinessErrorCode(ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, errorCode, ex.getMessage());
     }
 
     /**
-     * Maneja excepciones no capturadas por otros handlers.
-     * Retorna HTTP 500 Internal Server Error.
+     * Maneja errores de validación de Jakarta Bean Validation.
      * 
-     * @param ex Excepción genérica
-     * @param request Detalles del request HTTP
-     * @return ErrorResponse con mensaje genérico
+     * <p>Este método captura excepciones lanzadas cuando los datos de entrada no cumplen con
+     * las anotaciones de validación ({@code @NotBlank}, {@code @Email}, {@code @Min}, etc.).
+     * Extrae todos los errores de campo y los incluye en un mapa {@code validationErrors} dentro
+     * de la respuesta JSON para facilitar la corrección por parte del cliente.</p>
+     * 
+     * <p><strong>Ejemplo de respuesta:</strong></p>
+     * <pre>
+     * {
+     *   "errorCode": "SIRHA-400-002",
+     *   "message": "Errores de validación",
+     *   "validationErrors": {
+     *     "email": "debe ser una dirección de correo válida",
+     *     "nombre": "no debe estar vacío"
+     *   }
+     * }
+     * </pre>
+     * 
+     * @param ex la excepción de validación capturada con los errores de campo
+     * @return respuesta HTTP 400 con mapa detallado de errores de validación
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, Object> body = defaultBody(HttpStatus.BAD_REQUEST, ERROR_VALIDATION, "Errores de validación");
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        body.put("validationErrors", errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    /**
+     * Maneja errores de autenticación por credenciales incorrectas.
+     * 
+     * <p>Este método captura excepciones lanzadas por Spring Security cuando las credenciales
+     * de login (usuario/contraseña) no son válidas. Retorna HTTP 401 Unauthorized con el código
+     * de error SIRHA-401-001.</p>
+     * 
+     * @param ex la excepción de credenciales inválidas
+     * @return respuesta HTTP 401 indicando fallo de autenticación
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, ERROR_UNAUTHORIZED, "Credenciales inválidas");
+    }
+
+    /**
+     * Maneja errores de acceso denegado por falta de permisos.
+     * 
+     * <p>Este método captura excepciones lanzadas cuando un usuario autenticado intenta acceder
+     * a un recurso para el cual no tiene los permisos necesarios (por ejemplo, un estudiante
+     * intentando acceder a funciones de administrador). Retorna HTTP 403 Forbidden con el código
+     * de error SIRHA-403-001.</p>
+     * 
+     * @param ex la excepción de acceso denegado
+     * @return respuesta HTTP 403 indicando permisos insuficientes
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, ERROR_FORBIDDEN, "Acceso denegado");
+    }
+
+    /**
+     * Maneja todas las excepciones no controladas (catch-all).
+     * 
+     * <p>Este método actúa como red de seguridad para capturar cualquier excepción no manejada
+     * específicamente por otros handlers. Previene que detalles internos del servidor sean
+     * expuestos al cliente, retornando un mensaje genérico con HTTP 500 y código SIRHA-500-001.
+     * Los detalles completos de la excepción se registran en los logs del servidor.</p>
+     * 
+     * @param ex la excepción no controlada capturada
+     * @return respuesta HTTP 500 con mensaje genérico de error interno
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(
-            Exception ex,
-            WebRequest request) {
-        
-        log.error("Error no manejado: ", ex);
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("Internal Server Error")
-                .errorCode("SIRHA-500-001")
-                .message("Error interno del servidor")
-                .path(extractPath(request))
-                .build();
-        
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
+    // Registrar el error completo en logs para diagnóstico
+    log.error("Unhandled exception caught by GlobalExceptionHandler", ex);
+    return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_INTERNAL,
+        "Error interno del servidor");
     }
 
     /**
-     * Extrae el path del request HTTP.
+     * Determina el código de error específico basado en el mensaje de la excepción de negocio.
      * 
-     * @param request Request HTTP
-     * @return Path del request
+     * <p>Este método analiza el mensaje de error buscando palabras clave para clasificar el tipo
+     * de violación de regla de negocio y asignar un código de error más granular. Esto permite
+     * que los clientes identifiquen el tipo específico de problema y presenten mensajes más
+     * apropiados al usuario.</p>
+     * 
+     * <p><strong>Palabras clave y códigos resultantes:</strong></p>
+     * <ul>
+     *   <li>"horario" o "conflicto" → SIRHA-400-003 (conflicto de horario)</li>
+     *   <li>"cupo" o "lleno" → SIRHA-400-004 (cupo lleno)</li>
+     *   <li>"periodo" o "fecha" → SIRHA-400-005 (periodo cerrado)</li>
+     *   <li>Otros casos → SIRHA-400-001 (regla de negocio genérica)</li>
+     * </ul>
+     * 
+     * @param message mensaje de la excepción de negocio a analizar
+     * @return código de error específico correspondiente al tipo de violación
      */
-    private String extractPath(WebRequest request) {
-        String description = request.getDescription(false);
-        return description.replace("uri=", "");
+    private String determineBusinessErrorCode(String message) {
+        if (message.toLowerCase().contains("horario") || message.toLowerCase().contains("conflicto")) {
+            return ERROR_HORARIO_CONFLICT;
+        }
+        if (message.toLowerCase().contains("cupo") || message.toLowerCase().contains("lleno")) {
+            return ERROR_CUPO_LLENO;
+        }
+        if (message.toLowerCase().contains("periodo") || message.toLowerCase().contains("fecha")) {
+            return ERROR_PERIODO_CERRADO;
+        }
+        return ERROR_BUSINESS_RULE;
     }
 
     /**
-     * Clase interna que representa la estructura de respuestas de error.
+     * Construye una respuesta HTTP con el cuerpo de error estandarizado.
+     * 
+     * <p>Método auxiliar que combina el estado HTTP, código de error y mensaje en una
+     * respuesta {@link ResponseEntity} con el formato JSON estándar de SIRHA.</p>
+     * 
+     * @param status el estado HTTP a retornar (404, 400, 401, 403, 500, etc.)
+     * @param errorCode el código de error específico SIRHA
+     * @param message el mensaje descriptivo del error
+     * @return entidad de respuesta con cuerpo de error completo
      */
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ErrorResponse {
-        
-        /**
-         * Timestamp del error en formato ISO-8601.
-         */
-        private Instant timestamp;
-        
-        /**
-         * Código HTTP del error.
-         */
-        private int status;
-        
-        /**
-         * Nombre del error HTTP (ej: "Bad Request", "Not Found").
-         */
-        private String error;
-        
-        /**
-         * Código de error específico de SIRHA para tracking.
-         */
-        private String errorCode;
-        
-        /**
-         * Mensaje descriptivo del error.
-         */
-        private String message;
-        
-        /**
-         * Path del endpoint que generó el error.
-         */
-        private String path;
-        
-        /**
-         * Mapa de errores de validación por campo (solo para errores 400).
-         */
-        private Map<String, String> validationErrors;
+    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String errorCode, String message) {
+        return ResponseEntity.status(status).body(defaultBody(status, errorCode, message));
+    }
+
+    /**
+     * Crea el mapa de datos estándar para el cuerpo de respuesta de error.
+     * 
+     * <p>Este método genera la estructura JSON base que incluye timestamp, estado HTTP,
+     * código de error, mensaje y ruta de la petición. Este formato consistente facilita
+     * el manejo de errores por parte de los clientes de la API.</p>
+     * 
+     * @param status el estado HTTP del error
+     * @param errorCode el código de error SIRHA específico
+     * @param message el mensaje descriptivo del error
+     * @return mapa con los campos estándar de la respuesta de error
+     */
+    private Map<String, Object> defaultBody(HttpStatus status, String errorCode, String message) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("errorCode", errorCode);
+        body.put("message", message);
+        body.put("path", getCurrentPath());
+        return body;
+    }
+
+    /**
+     * Obtiene la ruta de la petición HTTP actual.
+     * 
+     * <p>Intenta recuperar la ruta de la petición desde el contexto de Spring. Si no está
+     * disponible (por ejemplo, en contextos de prueba o peticiones asíncronas), retorna
+     * un valor por defecto "/api/unknown" para evitar excepciones.</p>
+     * 
+     * @return la ruta de la petición actual o "/api/unknown" si no está disponible
+     */
+    private String getCurrentPath() {
+        try {
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null && attrs.getRequest() != null) {
+                return attrs.getRequest().getRequestURI();
+            }
+        } catch (Exception e) {
+            log.debug("Could not determine current request path", e);
+        }
+        return "/api/unknown";
     }
 }
-
-
-
-
-
-

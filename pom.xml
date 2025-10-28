@@ -211,7 +211,7 @@
 										<limit>
 											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.80</minimum>
+											<minimum>0.85</minimum>
 										</limit>
 									</limits>
 								</rule>
@@ -234,8 +234,6 @@
 					<!-- Ensure forked test JVMs receive the test profile during CI -->
 					<systemPropertyVariables>
 						<spring.profiles.active>test</spring.profiles.active>
-						<!-- Enable Byte Buddy experimental mode for Java 24 compatibility -->
-						<net.bytebuddy.experimental>true</net.bytebuddy.experimental>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>

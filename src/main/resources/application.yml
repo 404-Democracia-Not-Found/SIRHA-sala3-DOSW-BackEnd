@@ -1,10 +1,6 @@
 spring:
   application:
     name: sirha
-  # Cargar variables desde archivo .env
-  context:
-    initializer:
-      classes: edu.dosw.sirha.config.DotenvApplicationContextInitializer
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017}
@@ -42,16 +38,10 @@ sirha:
   security:
     jwt:
       issuer: sirha
-      expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
-      secret: ${JWT_SECRET}  # REQUERIDO - No hay valor por defecto
+      expiration-minutes: 60
+      secret: ${JWT_SECRET:change-me}
   solicitudes:
-    dias-max-respuesta: ${DIAS_MAX_RESPUESTA:5}
-  admin:
-    # Configuración del usuario ADMIN inicial (solo para primera instalación)
-    # Estos valores deben venir de variables de entorno por seguridad
-    email: ${SIRHA_ADMIN_EMAIL:#{null}}
-    password: ${SIRHA_ADMIN_PASSWORD:#{null}}
-    name: ${SIRHA_ADMIN_NAME:#{null}}
+    dias-max-respuesta: 5
 
 ---
 spring:
@@ -66,37 +56,14 @@ spring:
 sirha:
   security:
     jwt:
-      secret: test-secret-key-for-testing-purposes-only-min-256-bits
-  admin:
-    email: admin@test.local
-    password: TestAdmin123!
-    name: Admin Test
+      secret: test-secret
 
 ---
 spring:
   config:
     activate:
-      on-profile: development
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017}
-      database: ${MONGODB_DATABASE:SIRHA-dev}
-
-logging:
-  level:
-    root: DEBUG
-    edu.dosw.sirha: DEBUG
-
----
-spring:
-  config:
-    activate:
-      on-profile: production
+      on-profile: prod
 
 logging:
   level:
     root: WARN
-    edu.dosw.sirha: INFO
-
-# En producción, TODAS las variables deben venir del entorno
-# NO usar valores por defecto en producción

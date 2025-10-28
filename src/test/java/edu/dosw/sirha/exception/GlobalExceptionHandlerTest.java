@@ -3,9 +3,6 @@ package edu.dosw.sirha.exception;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -14,7 +11,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.context.request.WebRequest;
 
 /**
  * Suite de pruebas unitarias para {@link GlobalExceptionHandler}.
@@ -50,63 +46,49 @@ import org.springframework.web.context.request.WebRequest;
 class GlobalExceptionHandlerTest {
 
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
-    private final WebRequest mockRequest = mock(WebRequest.class);
 
     @Test
     void handleNotFoundShouldReturnNotFoundStatus() {
-        when(mockRequest.getDescription(false)).thenReturn("uri=/api/test");
-        
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = handler.handleResourceNotFound(
-                new ResourceNotFoundException("No existe"),
-                mockRequest);
+        ResponseEntity<Map<String, Object>> response = handler.handleNotFound(
+                new ResourceNotFoundException("No existe"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody().getMessage()).isEqualTo("No existe");
-        assertThat(response.getBody().getErrorCode()).isEqualTo("SIRHA-404-001");
+        assertThat(response.getBody()).containsEntry("message", "No existe");
     }
 
     @Test
     void handleBusinessShouldReturnBadRequest() {
-        when(mockRequest.getDescription(false)).thenReturn("uri=/api/test");
-        
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = handler.handleBusinessException(
-                new BusinessException("Regla de negocio"),
-                mockRequest);
+        ResponseEntity<Map<String, Object>> response = handler.handleBusiness(
+                new BusinessException("Regla de negocio"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody().getMessage()).isEqualTo("Regla de negocio");
-        assertThat(response.getBody().getErrorCode()).isEqualTo("SIRHA-400-002");
+        assertThat(response.getBody()).containsEntry("message", "Regla de negocio");
     }
 
     @Test
     void handleValidationShouldIncludeFieldErrors() throws NoSuchMethodException {
-        when(mockRequest.getDescription(false)).thenReturn("uri=/api/test");
-        
         BindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "solicitud");
         bindingResult.addError(new FieldError("solicitud", "estudianteId", "requerido"));
         MethodParameter parameter = new MethodParameter(
                 GlobalExceptionHandlerTest.class.getDeclaredMethod("dummyMethod", String.class), 0);
         MethodArgumentNotValidException exception = new MethodArgumentNotValidException(parameter, bindingResult);
 
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = handler.handleValidationExceptions(
-                exception,
-                mockRequest);
+        ResponseEntity<Map<String, Object>> response = handler.handleValidation(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody().getValidationErrors()).containsEntry("estudianteId", "requerido");
+        assertThat(response.getBody()).containsKey("validationErrors");
+        @SuppressWarnings("unchecked")
+        Map<String, String> errors = (Map<String, String>) response.getBody().get("validationErrors");
+        assertThat(errors).containsEntry("estudianteId", "requerido");
     }
 
     @Test
     void handleGenericShouldReturnInternalServerError() {
-        when(mockRequest.getDescription(false)).thenReturn("uri=/api/test");
-        
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response = handler.handleGlobalException(
-                new RuntimeException("boom"),
-                mockRequest);
+        ResponseEntity<Map<String, Object>> response = handler.handleGeneric(new RuntimeException("boom"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody().getMessage()).isEqualTo("Error interno del servidor");
-        assertThat(response.getBody().getErrorCode()).isEqualTo("SIRHA-500-001");
+        assertThat(response.getBody()).containsEntry("message", "Error interno del servidor");
+        assertThat(response.getBody()).containsEntry("errorCode", "SIRHA-500-001");
     }
 
     @SuppressWarnings("unused")
