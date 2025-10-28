@@ -85,9 +85,9 @@ public class JwtTokenService {
 	 * @param userDetails Detalles del usuario autenticado
 	 * @return Token JWT firmado
 	 */
-	public String generateToken(UserDetails userDetails, int expirationMinutes) {
+	public String generateToken(UserDetails userDetails) {
 		Instant now = Instant.now(clock);
-		Instant expiration = now.plus(expirationMinutes, ChronoUnit.MINUTES);
+		Instant expiration = now.plus(properties.getExpirationMinutes(), ChronoUnit.MINUTES);
 		return Jwts.builder()
 				.setSubject(userDetails.getUsername())
 				.setIssuer(properties.getIssuer())
