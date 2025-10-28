@@ -4,8 +4,6 @@ import edu.dosw.sirha.dto.auth.AuthRequest;
 import edu.dosw.sirha.dto.auth.AuthResponse;
 import edu.dosw.sirha.dto.request.RegisterRequest;
 import edu.dosw.sirha.dto.response.RegisterResponse;
-import edu.dosw.sirha.dto.request.RefreshRequest;
-import edu.dosw.sirha.dto.response.RefreshResponse;
 import edu.dosw.sirha.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
