@@ -8,14 +8,14 @@ Sistema backend desarrollado en **Spring Boot** para la gestión integral de hor
 
 ## Objetivos Cumplidos
 
-- ✅ **Endpoints profesionales** – API REST completa y documentada
-- ✅ **Principios SOLID** – Arquitectura limpia con separación de responsabilidades
-- ✅ **MongoDB Atlas integrado** – Conexión exitosa a base de datos cloud
-- ✅ **Swagger/OpenAPI** – Documentación interactiva de API
-- ✅ **Autenticación JWT** – Seguridad implementada con Spring Security
-- ✅ **Sistema de roles** – ADMIN, COORDINADOR, PROFESOR, ESTUDIANTE
-- ✅ **CI/CD automatizado** – GitHub Actions con deploy a Azure
-- ✅ **Detección de conflictos** – Validación automática de horarios
+- **Endpoints profesionales** – API REST completa y documentada
+- **Principios SOLID** – Arquitectura limpia con separación de responsabilidades
+- **MongoDB Atlas integrado** – Conexión exitosa a base de datos cloud
+- **Swagger/OpenAPI** – Documentación interactiva de API
+- **Autenticación JWT** – Seguridad implementada con Spring Security
+- **Sistema de roles** – ADMIN, COORDINADOR, PROFESOR, ESTUDIANTE
+- **CI/CD automatizado** – GitHub Actions con deploy a Azure
+- **Detección de conflictos** – Validación automática de horarios
 
 ---
 
@@ -103,7 +103,7 @@ JWT_SECRET=tu-clave-secreta-minimo-256-bits
 SERVER_PORT=8081
 ```
 
-**⚠️ IMPORTANTE:** Nunca commitear `.env` a Git. Usar valores fuertes en producción.
+**IMPORTANTE:** Nunca commitear `.env` a Git. Usar valores fuertes en producción.
 
 ### 3. Instalar y ejecutar
 
@@ -175,7 +175,7 @@ Password: Admin123!
 Rol: ADMIN
 ```
 
-**⚠️ Cambiar estas credenciales en producción**
+**Cambiar estas credenciales en producción**
 
 ---
 
@@ -376,15 +376,15 @@ src/main/java/edu/dosw/sirha/
 
 ### Implementadas
 
-- ✅ Email válido y único
-- ✅ Campos obligatorios validados
-- ✅ Roles y permisos verificados
-- ✅ Contraseñas encriptadas (BCrypt)
-- ✅ Tokens JWT con expiración
-- ✅ HTTPS en producción
-- ✅ CORS configurado
-- ✅ Validación de períodos académicos
-- ✅ Detección automática de conflictos
+- Email válido y único
+- Campos obligatorios validados
+- Roles y permisos verificados
+- Contraseñas encriptadas (BCrypt)
+- Tokens JWT con expiración
+- HTTPS en producción
+- CORS configurado
+- Validación de períodos académicos
+- Detección automática de conflictos
 
 ---
 
