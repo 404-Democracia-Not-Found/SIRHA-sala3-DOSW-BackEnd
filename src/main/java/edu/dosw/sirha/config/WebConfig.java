@@ -83,11 +83,10 @@ public class WebConfig implements WebMvcConfigurer {
      * 
      * <p><strong>Configuración actual:</strong></p>
      * <ul>
-     *   <li><strong>Endpoints protegidos:</strong> Todos los paths (/**)</li>
-     *   <li><strong>Orígenes permitidos:</strong> localhost:3000, localhost:5173, 127.0.0.1:3000, 127.0.0.1:5173</li>
-     *   <li><strong>Métodos HTTP:</strong> GET, POST, PUT, DELETE, PATCH, OPTIONS</li>
-     *   <li><strong>Headers permitidos:</strong> Authorization, Content-Type, Accept, Origin, X-Requested-With</li>
-     *   <li><strong>Headers expuestos:</strong> Authorization</li>
+     *   <li><strong>Endpoints protegidos:</strong> Todos bajo el path /api/**</li>
+     *   <li><strong>Orígenes permitidos:</strong> localhost:3000, 127.0.0.1:3000 (configurable vía ALLOWED_ORIGINS)</li>
+     *   <li><strong>Métodos HTTP:</strong> GET, POST, PUT, DELETE, PATCH</li>
+     *   <li><strong>Headers permitidos:</strong> Authorization, Content-Type, Accept</li>
      *   <li><strong>Credenciales:</strong> Habilitadas (permite cookies y headers de autenticación)</li>
      *   <li><strong>Cache preflight:</strong> 1 hora (3600 segundos)</li>
      * </ul>
@@ -102,10 +101,10 @@ public class WebConfig implements WebMvcConfigurer {
      * <p><strong>Configuración por entorno:</strong></p>
      * <p>Los orígenes permitidos pueden configurarse mediante la variable de entorno
      * {@code ALLOWED_ORIGINS}. Si no está definida, usa valores por defecto para
-     * desarrollo local con soporte para React (puerto 3000) y Vite (puerto 5173):</p>
+     * desarrollo local:</p>
      * <pre>{@code
      * # Desarrollo (por defecto)
-     * http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173
+     * http://localhost:3000,http://127.0.0.1:3000
      * 
      * # Producción (ejemplo)
      * ALLOWED_ORIGINS=https://sirha.escuelaing.edu.co,https://www.sirha.escuelaing.edu.co
@@ -134,8 +133,6 @@ public class WebConfig implements WebMvcConfigurer {
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With")
-                .exposedHeaders("Authorization")
-                .allowCredentials(true)
-                .maxAge(3600);
+                .exposedHeaders("Authorization");       
     }
 }
