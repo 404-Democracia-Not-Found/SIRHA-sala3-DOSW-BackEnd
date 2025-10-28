@@ -1,4 +1,4 @@
-package edu.dosw.sirha.dto.auth;
+package edu.dosw.sirha.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
