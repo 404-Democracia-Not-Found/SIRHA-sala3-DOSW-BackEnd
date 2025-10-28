@@ -11,6 +11,7 @@ import edu.dosw.sirha.model.User;
 import edu.dosw.sirha.model.enums.Genero;
 import edu.dosw.sirha.model.enums.Rol;
 import edu.dosw.sirha.repository.UserRepository;
+import edu.dosw.sirha.security.JwtProperties;
 import edu.dosw.sirha.security.JwtTokenService;
 import edu.dosw.sirha.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Servicio de autenticación y registro de usuarios en SIRHA.
@@ -47,6 +49,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
+    private final JwtProperties jwtProperties;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
@@ -79,13 +82,18 @@ public class AuthService {
             throw new BusinessException("La cuenta de usuario está inactiva");
         }
 
-        // Generar token JWT
+        // Generar tokens JWT
         UserPrincipal principal = new UserPrincipal(user);
+        Instant issuedAt = Instant.now(clock);
+        
         String token = jwtTokenService.generateToken(principal);
-        Instant expiresAt = jwtTokenService.getExpirationFromToken(token);
+        Instant expiresAt = issuedAt.plus(jwtProperties.getExpirationMinutes(), ChronoUnit.MINUTES);
+        
+        String refreshToken = jwtTokenService.generateToken(principal, jwtProperties.getRefreshExpirationMinutes());
+        Instant refreshExpiresAt = issuedAt.plus(jwtProperties.getRefreshExpirationMinutes(), ChronoUnit.MINUTES);
 
         // Actualizar último acceso
-        user.setUltimoAcceso(Instant.now(clock));
+        user.setUltimoAcceso(issuedAt);
         userRepository.save(user);
 
         log.info("Login exitoso para usuario: {} con rol: {}", user.getEmail(), user.getRol());
@@ -94,6 +102,8 @@ public class AuthService {
         return new AuthResponse(
                 token,
                 expiresAt,
+                refreshToken,
+                refreshExpiresAt,
                 new AuthResponse.UserInfo(
                         user.getId(),
                         user.getNombre(),
