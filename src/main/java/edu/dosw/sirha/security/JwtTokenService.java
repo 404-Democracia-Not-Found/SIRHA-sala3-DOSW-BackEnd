@@ -24,7 +24,7 @@ import java.util.function.Function;
  * 
  * <p>Proporciona operaciones para:</p>
  * <ul>
- *   <li>Generar tokens JWT firmados con HS256 (access y refresh tokens)</li>
+ *   <li>Generar tokens JWT firmados con HS256</li>
  *   <li>Validar tokens (firma, expiración, usuario)</li>
  *   <li>Extraer información (username, claims) de tokens</li>
  * </ul>
@@ -32,10 +32,11 @@ import java.util.function.Function;
  * <p>Configuración mediante {@link JwtProperties}:</p>
  * <ul>
  *   <li>secret: Clave secreta para firmar tokens (BASE64)</li>
- *   <li>expirationMinutes: Tiempo de vida del access token</li>
- *   <li>refreshExpirationMinutes: Tiempo de vida del refresh token</li>
+ *   <li>expirationMinutes: Tiempo de vida del token</li>
  *   <li>issuer: Identificador del emisor</li>
  * </ul>
+ * 
+ * <p>Usa {@link Clock} inyectado para permitir control del tiempo en tests.</p>
  * 
  * @see JwtProperties
  * @see JwtAuthFilter
@@ -71,35 +72,20 @@ public class JwtTokenService {
 	}
 
 	/**
-	 * Genera un nuevo access token JWT con expiración estándar.
+	 * Genera un nuevo token JWT para un usuario autenticado.
 	 * 
-	 * <p>Token incluye: subject (username), issuer, issuedAt y expiration.</p>
+	 * <p>Token incluye:</p>
+	 * <ul>
+	 *   <li>Subject: username del usuario</li>
+	 *   <li>Issuer: configurado en properties</li>
+	 *   <li>IssuedAt: timestamp actual</li>
+	 *   <li>Expiration: tiempo actual + expirationMinutes</li>
+	 * </ul>
 	 * 
 	 * @param userDetails Detalles del usuario autenticado
 	 * @return Token JWT firmado
 	 */
-	public String generateToken(UserDetails userDetails) {
-		Instant now = Instant.now(clock);
-		Instant expiration = now.plus(properties.getExpirationMinutes(), ChronoUnit.MINUTES);
-		return Jwts.builder()
-				.setSubject(userDetails.getUsername())
-				.setIssuer(properties.getIssuer())
-				.setIssuedAt(Date.from(now))
-				.setExpiration(Date.from(expiration))
-				.signWith(getSigningKey(), SignatureAlgorithm.HS256)
-				.compact();
-	}
-
-	/**
-	 * Genera un token JWT con expiración personalizada.
-	 * 
-	 * <p>Útil para generar refresh tokens con mayor tiempo de vida.</p>
-	 * 
-	 * @param userDetails Detalles del usuario autenticado
-	 * @param expirationMinutes Tiempo de expiración en minutos
-	 * @return Token JWT firmado con expiración personalizada
-	 */
-	public String generateToken(UserDetails userDetails, long expirationMinutes) {
+	public String generateToken(UserDetails userDetails, int expirationMinutes) {
 		Instant now = Instant.now(clock);
 		Instant expiration = now.plus(expirationMinutes, ChronoUnit.MINUTES);
 		return Jwts.builder()
@@ -114,11 +100,15 @@ public class JwtTokenService {
 	/**
 	 * Valida un token JWT contra un usuario.
 	 * 
-	 * <p>Verifica que el username coincida y el token no esté expirado.</p>
+	 * <p>Verifica que:</p>
+	 * <ul>
+	 *   <li>El username del token coincida con el del usuario</li>
+	 *   <li>El token no esté expirado</li>
+	 * </ul>
 	 * 
 	 * @param token Token JWT a validar
 	 * @param userDetails Usuario contra el que validar
-	 * @return true si token es válido para ese usuario
+	 * @return true si token es válido para ese usuario, false si no
 	 */
 	public boolean isTokenValid(String token, UserDetails userDetails) {
 		String username = extractUsername(token);
@@ -163,10 +153,16 @@ public class JwtTokenService {
 	}
 
 	/**
-	 * Obtiene la clave de firma HMAC-SHA256 para tokens JWT.
+	 * Obtiene la clave de firma para tokens JWT.
 	 * 
-	 * <p>Lee el secret de properties (BASE64), aplica padding si es necesario
-	 * para cumplir el mínimo de 32 bytes requerido por HS256.</p>
+	 * <p>Proceso de obtención:</p>
+	 * <ol>
+	 *   <li>Lee secret de properties (BASE64)</li>
+	 *   <li>Si no hay secret, usa uno por defecto</li>
+	 *   <li>Decodifica de BASE64 a bytes</li>
+	 *   <li>Si menos de 32 bytes, hace padding</li>
+	 *   <li>Crea clave HMAC-SHA256</li>
+	 * </ol>
 	 * 
 	 * @return Clave de firma HMAC-SHA256
 	 */
