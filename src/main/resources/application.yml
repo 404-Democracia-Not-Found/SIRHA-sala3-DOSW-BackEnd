@@ -80,7 +80,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017}
-      database: ${MONGODB_DATABASE:SIRHA-dev}
+      database: ${MONGODB_DATABASE:SIRHA}
 
 logging:
   level:
