@@ -37,6 +37,13 @@ public class SecurityConfig {
 		.cors().and()
 		.csrf(csrf -> csrf.disable())
 		.authorizeHttpRequests(auth -> auth
+			// Permitir preflight CORS
+			.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+			// Endpoints públicos de autenticación (con y sin acento)
+			.requestMatchers("/api/auth/**").permitAll()
+			.requestMatchers("/Autenticación/**").permitAll()
+			.requestMatchers("/Autenticacion/**").permitAll()
+			// Recursos estáticos y documentación
 			.requestMatchers(
 				"/",
 				"/index.html",
@@ -44,9 +51,6 @@ public class SecurityConfig {
 				"/css/**",
 				"/js/**",
 				"/images/**",
-				   "/api/auth/**",
-				   "/Autenticación/**",
-				   "/Autenticacion/**",
 				"/actuator/**",
 				"/v3/api-docs/**",
 				"/swagger-ui/**",
