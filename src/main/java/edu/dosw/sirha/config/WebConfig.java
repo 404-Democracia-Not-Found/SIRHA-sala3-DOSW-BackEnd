@@ -132,7 +132,9 @@ public class WebConfig implements WebMvcConfigurer {
                     "${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173}"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                .allowedHeaders("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With")
-                .exposedHeaders("Authorization");       
+                .allowedHeaders("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "X-CSRF-Token")
+                .exposedHeaders("Authorization", "X-Total-Count")
+                .allowCredentials(true)
+                .maxAge(3600);       
     }
 }
