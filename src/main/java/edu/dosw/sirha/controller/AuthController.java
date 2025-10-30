@@ -75,6 +75,12 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+
+    // Alias para compatibilidad con frontend que usa acentos o sin acento
+    @PostMapping(path = {"/Autenticación/login", "/Autenticacion/login"})
+    public ResponseEntity<AuthResponse> loginAlias(@Valid @RequestBody AuthRequest request) {
+        return login(request);
+    }
     
     /**
      * Registra un nuevo usuario en el sistema SIRHA.
