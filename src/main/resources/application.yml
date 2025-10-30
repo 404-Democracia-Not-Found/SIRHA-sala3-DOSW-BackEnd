@@ -6,24 +6,6 @@ spring:
     initializer:
       classes: edu.dosw.sirha.config.DotenvApplicationContextInitializer
   data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017}
-      database: ${MONGODB_DATABASE:SIRHA}
-  jackson:
-    default-property-inclusion: non_null
-  main:
-    banner-mode: off
-
-server:
-  port: ${SERVER_PORT:8081}
-  error:
-    include-message: always
-    include-binding-errors: always
-
-logging:
-  pattern:
-    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
-  level:
     root: INFO
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
@@ -49,28 +31,7 @@ sirha:
   admin:
     # Configuración del usuario ADMIN inicial (solo para primera instalación)
     # Estos valores deben venir de variables de entorno por seguridad
-    email: ${SIRHA_ADMIN_EMAIL:#{null}}
-    password: ${SIRHA_ADMIN_PASSWORD:#{null}}
-    name: ${SIRHA_ADMIN_NAME:#{null}}
 
----
-spring:
-  config:
-    activate:
-      on-profile: test
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/sirha-test
-      database: sirha-test
-
-sirha:
-  security:
-    jwt:
-      secret: test-secret-key-for-testing-purposes-only-min-256-bits
-  admin:
-    email: admin@test.local
-    password: TestAdmin123!
-    name: Admin Test
 
 ---
 spring:
