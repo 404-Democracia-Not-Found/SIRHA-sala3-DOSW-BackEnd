@@ -10,7 +10,6 @@ WORKDIR /app
 
 # Copiar archivos de configuración de Maven primero (para cache de dependencias)
 COPY pom.xml .
-COPY .mvn .mvn
 
 # Descargar dependencias (se cachea si pom.xml no cambia)
 RUN mvn dependency:go-offline -B
