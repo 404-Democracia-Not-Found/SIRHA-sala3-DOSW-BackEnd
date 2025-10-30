@@ -10,8 +10,8 @@ spring:
       validation-timeout: 5000
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/sirha}
-      database: ${MONGODB_DATABASE:sirha}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/SIRHA}
+      database: ${MONGODB_DATABASE:SIRHA}
   jpa:
     open-in-view: false
     properties:
