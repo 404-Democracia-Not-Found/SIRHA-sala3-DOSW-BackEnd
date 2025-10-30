@@ -34,6 +34,7 @@ public class SecurityConfig {
 			AuthenticationProvider authenticationProvider,
 			JwtAuthFilter jwtAuthFilter) throws Exception {
 		http
+		.cors().and()
 		.csrf(csrf -> csrf.disable())
 		.authorizeHttpRequests(auth -> auth
 			.requestMatchers(
